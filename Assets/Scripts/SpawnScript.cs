@@ -22,8 +22,9 @@ public class SpawnScript : MonoBehaviour {
         for (int n = 0; n < numberOfBlocks; n++)
         {
             GameObject spawn = new GameObject();
-            //spawn.transform.SetParent(GameObject.Find("Spawn Locations").transform);
-            spawn.transform.position = new Vector3(2f * (n % 3) - 1, 10 - ((n / 3) * 2), 0);
+            spawn.transform.SetParent(GameObject.Find("Spawn Locations").transform);
+            spawn.name = "Spawn " + (n + 1);
+            spawn.transform.position = new Vector3(3 - 2f * (n % 3), 5 + ((n / 3) * 2), 0);
             spawnLocations.Add(spawn);
         }
         

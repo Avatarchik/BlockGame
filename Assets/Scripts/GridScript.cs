@@ -16,10 +16,12 @@ public class GridScript : MonoBehaviour {
     public GameObject[,] gridGO;
     public int gridSize;
     public Color gColor;
-   
+    public int maxBlockSize = 3;
+
     void Start()
     {
         gridGO = new GameObject[gridSize, gridSize];
+        gColor = Color.grey;
 
         //Create the grid
         for (int x = 0; x < gridSize; x++)
@@ -28,7 +30,7 @@ public class GridScript : MonoBehaviour {
             {
                 gridGO[x, y] = Instantiate(Resources.Load("Prefabs/Base Square"), new Vector3(x, y, 1f), Quaternion.identity) as GameObject;
                 gridGO[x, y].GetComponent<SpriteRenderer>().sortingLayerName = "grid";
-                gridGO[x, y].GetComponent<SpriteRenderer>().color = Color.grey;
+                gridGO[x, y].GetComponent<SpriteRenderer>().color = gColor;
                 gridGO[x, y].transform.parent = GameObject.Find("Grid").transform;
                 gridGO[x, y].name = ("grid pos " + x + "," + y);
                 SquareScript baseSquareSS = gridGO[x, y].GetComponent<SquareScript>();

@@ -13,18 +13,39 @@ public class SquareScript : MonoBehaviour
 
     Vector3 screenPoint;
     Vector3 offset;
+    Vector3 originalPos;
     GameObject[,] gridGO { get { return GridScript.Instance.gridGO; } set { GridScript.Instance.gridGO = value; } }
 
+    float doubleClickTime = 0.3f;
+    float lastClickTime = -10f;
+
+//#if UNITY_EDITOR
     void OnMouseDown()
     {
         offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
+        originalPos = gameObject.transform.position;
 
-        if (this.sType == SquareType.Block)
+        float timeDelta = Time.time - lastClickTime;
+        if (timeDelta < doubleClickTime)
         {
-            parentBlock.transform.localScale = Vector3.one;
+            //Double Click
+            Debug.Log("double click" + timeDelta);
+            //Roda o bloco se ele nao esta posicionado
+            if (!parentBlock.bPlaced)
+                parentBlock.RotateMatrix(true);
+            //Traz ele de volta para o spawn se estiver
+            else
+            {
+                RemoveBlockGrid(parentBlock.bNumber);
+                parentBlock.RespawnBlock();
+            }
+            lastClickTime = 0;
         }
+        else
+            lastClickTime = Time.time;
+        
     }
-
+ 
     void OnMouseDrag()
     {
         Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
@@ -32,6 +53,11 @@ public class SquareScript : MonoBehaviour
 
         if (this.sType == SquareType.Block)
         {
+            if ((curPosition - originalPos).sqrMagnitude >= 0.25f)
+            {
+                parentBlock.transform.localScale = Vector3.one;
+            }
+
             RemoveBlockGrid(parentBlock.bNumber);
             ClearGridColor();
 
@@ -64,12 +90,35 @@ public class SquareScript : MonoBehaviour
                 Debug.Log("Voce ganhou!!");
                 GridScript.Instance.WinEvent();
             }
-                
+
         }
-        ClearGridColor();        
+        ClearGridColor();
     }
 
-    #region Private
+//#else
+//    void Update()
+//    {
+//        if (Input.touchCount > 0)
+//        {
+//            totalTime += Input.GetTouch(0).deltaTime;
+
+//            if (totalTime >= holdTime)
+//            {
+//                //Long tap
+//                Debug.Log("long tap");
+//            }
+
+//            if (Input.GetTouch(0).phase == TouchPhase.Ended) 
+//            {
+//                Debug.Log("short tap");
+//                totalTime = 0;
+//            }
+//        }
+//    }
+    
+//#endif
+
+#region Private
     //Checa se o bloco pode ser posicionado em certo local
     bool CheckPosition(GameObject blockGO, Vector2 destiny)
     {
@@ -80,7 +129,7 @@ public class SquareScript : MonoBehaviour
             Vector2 squarePos = closestGridLoc - this.relativePos + square.relativePos;
             if (squarePos.x < 0 || squarePos.x >= GridScript.Instance.gridSize || squarePos.y < 0 || squarePos.y >= GridScript.Instance.gridSize)
             {
-                Debug.Log("Bloco fora do grid!");
+                //Debug.Log("Bloco fora do grid!");
                 return false;
             }
 
@@ -170,5 +219,5 @@ public class SquareScript : MonoBehaviour
             }
         }            
     }
-    #endregion
+#endregion
 }
