@@ -18,7 +18,7 @@ public class BlockScript : MonoBehaviour
 
     void Start()
     {
-        maxBlockSize = GridScript.Instance.maxBlockSize;
+        maxBlockSize = SpawnScript.Instance.blockSize;
         sList = new List<SquareScript>();;
         bMatrix = new int[maxBlockSize, maxBlockSize];
         bNumber = SpawnScript.Instance.blocksList.Count + 1;
@@ -74,7 +74,7 @@ public class BlockScript : MonoBehaviour
             }
         }
         transform.position = SpawnScript.Instance.spawnLocations[bNumber - 1].transform.position;
-        this.transform.localScale = new Vector3(0.6f, 0.6f, 1f);
+        this.transform.localScale = new Vector3(SpawnScript.Instance.blockScale, SpawnScript.Instance.blockScale, 1f);
                 
     }
 

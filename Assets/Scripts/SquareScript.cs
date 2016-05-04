@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public enum SquareType { Block, GridEmpty, GridFilled }
+public enum SquareType { Block, GridEmpty, GridUsed, GridFilled }
 
 public class SquareScript : MonoBehaviour
 {
@@ -16,34 +16,16 @@ public class SquareScript : MonoBehaviour
     Vector3 originalPos;
     GameObject[,] gridGO { get { return GridScript.Instance.gridGO; } set { GridScript.Instance.gridGO = value; } }
 
-    float doubleClickTime = 0.3f;
-    float lastClickTime = -10f;
+    float clickTime;
+    float holdTime = 0.75f;
+
 
 //#if UNITY_EDITOR
     void OnMouseDown()
     {
         offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
         originalPos = gameObject.transform.position;
-
-        float timeDelta = Time.time - lastClickTime;
-        if (timeDelta < doubleClickTime)
-        {
-            //Double Click
-            Debug.Log("double click" + timeDelta);
-            //Roda o bloco se ele nao esta posicionado
-            if (!parentBlock.bPlaced)
-                parentBlock.RotateMatrix(true);
-            //Traz ele de volta para o spawn se estiver
-            else
-            {
-                RemoveBlockGrid(parentBlock.bNumber);
-                parentBlock.RespawnBlock();
-            }
-            lastClickTime = 0;
-        }
-        else
-            lastClickTime = Time.time;
-        
+        clickTime = Time.time;
     }
  
     void OnMouseDrag()
@@ -53,18 +35,25 @@ public class SquareScript : MonoBehaviour
 
         if (this.sType == SquareType.Block)
         {
-            if ((curPosition - originalPos).sqrMagnitude >= 0.25f)
+            if ((curPosition - originalPos).sqrMagnitude <= 0.25f)
+            {
+                if ((Time.time - clickTime > holdTime))
+                {
+                    clickTime = Time.time;
+                    parentBlock.RotateMatrix(true);
+                }
+            }
+            else
             {
                 parentBlock.transform.localScale = Vector3.one;
+                RemoveBlockGrid(parentBlock.bNumber);
+                ClearGridColor();
+
+                //Traz o bloco para frente na camera
+                Vector3 blockPosition = new Vector3(curPosition.x - (transform.localPosition.x * parentBlock.transform.localScale.x), curPosition.y - (transform.localPosition.y * parentBlock.transform.localScale.x), -1f);
+                parentBlock.transform.position = blockPosition;
+                PaintGridPreview();
             }
-
-            RemoveBlockGrid(parentBlock.bNumber);
-            ClearGridColor();
-
-            //Traz o bloco para frente na camera
-            Vector3 blockPosition = new Vector3(curPosition.x - (transform.localPosition.x * parentBlock.transform.localScale.x), curPosition.y - (transform.localPosition.y * parentBlock.transform.localScale.x), -1f);
-            parentBlock.transform.position = blockPosition;
-            PaintGridPreview();
         }
     }
 
@@ -83,7 +72,7 @@ public class SquareScript : MonoBehaviour
                 parentBlock.bPlaced = false;
 
                 parentBlock.transform.localPosition = SpawnScript.Instance.spawnLocations[parentBlock.bNumber - 1].transform.position;
-                parentBlock.gameObject.transform.localScale = new Vector3(0.6f, 0.6f, 1f);
+                parentBlock.gameObject.transform.localScale = new Vector3(SpawnScript.Instance.blockScale, SpawnScript.Instance.blockScale, 1f);
             }
             if (GridScript.Instance.CheckWin())
             {
@@ -152,7 +141,7 @@ public class SquareScript : MonoBehaviour
         {
             Vector2 pos = (destiny - relativePos) + square.relativePos;
             SquareScript gridSquare = gridGO[(int)pos.x, (int)pos.y].GetComponent<SquareScript>();
-            gridSquare.sType = SquareType.GridFilled;
+            gridSquare.sType = SquareType.GridUsed;
             gridSquare.squareGridPos = pos;
             gridSquare.relativePos = square.relativePos;
             gridSquare.parentBlock = parentBlock.GetComponent<BlockScript>();
@@ -188,6 +177,15 @@ public class SquareScript : MonoBehaviour
 
             }
         }
+
+        foreach (Vector2 filledPos in GridScript.Instance.filledListPos)
+        {
+            int x = (int)filledPos.x;
+            int y = (int)filledPos.y;
+            gridGO[x, y].GetComponent<SpriteRenderer>().color = GridScript.Instance.filledColor;
+            gridGO[x, y].GetComponent<SquareScript>().bNumber = -1;
+            gridGO[x, y].GetComponent<SquareScript>().sType = SquareType.GridFilled;
+        }
     }
 
     void ClearGridColor()
@@ -198,6 +196,13 @@ public class SquareScript : MonoBehaviour
             {
                 gridGO[x, y].GetComponent<SpriteRenderer>().color = Color.grey;
             }
+        }
+
+        foreach (Vector2 filledPos in GridScript.Instance.filledListPos)
+        {
+            int x = (int)filledPos.x;
+            int y = (int)filledPos.y;
+            gridGO[x, y].GetComponent<SpriteRenderer>().color = GridScript.Instance.filledColor;
         }
     }
 

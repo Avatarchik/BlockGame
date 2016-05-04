@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class GridScript : MonoBehaviour {
 
@@ -16,7 +17,9 @@ public class GridScript : MonoBehaviour {
     public GameObject[,] gridGO;
     public int gridSize;
     public Color gColor;
-    public int maxBlockSize = 3;
+
+    public Color filledColor;
+    public List<Vector2> filledListPos = new List<Vector2>();
 
     void Start()
     {
@@ -39,6 +42,15 @@ public class GridScript : MonoBehaviour {
                 baseSquareSS.parentBlock = null;
                 baseSquareSS.bNumber = 0;
             }
+        }
+
+        foreach (Vector2 filledPos in filledListPos)
+        {
+            int x = (int)filledPos.x;
+            int y = (int)filledPos.y;
+            gridGO[x, y].GetComponent<SpriteRenderer>().color = filledColor;
+            gridGO[x, y].GetComponent<SquareScript>().bNumber = -1;
+            gridGO[x, y].GetComponent<SquareScript>().sType = SquareType.GridFilled;
         }
     }
 
