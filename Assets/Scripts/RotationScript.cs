@@ -7,6 +7,7 @@ public class RotationScript : MonoBehaviour
     float clickTime;
     float holdTime = 0.75f;
 
+
     void OnMouseDown()
     {
         clickTime = Time.time;
@@ -16,7 +17,7 @@ public class RotationScript : MonoBehaviour
     {
         if ((Time.time - clickTime > holdTime))
         {
-            SpawnScript.Instance.blocksList[bNumber].GetComponent<BlockScript>().RotateMatrix(true);
+            SpawnScript.Instance.activeBlocksList[bNumber].GetComponent<BlockScript>().RotateMatrix(true);
             clickTime = Time.time;
         }
     }

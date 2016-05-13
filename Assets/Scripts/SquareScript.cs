@@ -35,7 +35,7 @@ public class SquareScript : MonoBehaviour
 
         if (this.sType == SquareType.Block)
         {
-            if ((curPosition - originalPos).sqrMagnitude <= 0.25f)
+            if (((curPosition - originalPos).sqrMagnitude <= 0.1f) && !parentBlock.bPlaced)
             {
                 if ((Time.time - clickTime > holdTime))
                 {
@@ -116,7 +116,7 @@ public class SquareScript : MonoBehaviour
         {
             //Bloco esta dentro do grid?
             Vector2 squarePos = closestGridLoc - this.relativePos + square.relativePos;
-            if (squarePos.x < 0 || squarePos.x >= GridScript.Instance.gridSize || squarePos.y < 0 || squarePos.y >= GridScript.Instance.gridSize)
+            if (squarePos.x < 0 || squarePos.x >= SpawnScript.Instance.gridSize || squarePos.y < 0 || squarePos.y >= SpawnScript.Instance.gridSize)
             {
                 //Debug.Log("Bloco fora do grid!");
                 return false;
@@ -158,9 +158,9 @@ public class SquareScript : MonoBehaviour
     //Remove todos os blocos do grid com o bNumber 
     void RemoveBlockGrid(int blockNumber)
     {
-        for (int x = 0; x < GridScript.Instance.gridSize; x++)
+        for (int x = 0; x < SpawnScript.Instance.gridSize; x++)
         {
-            for (int y = 0; y < GridScript.Instance.gridSize; y++)
+            for (int y = 0; y < SpawnScript.Instance.gridSize; y++)
             {
                 if (gridGO[x, y].GetComponent<SquareScript>().bNumber == this.bNumber)
                 {
@@ -190,9 +190,9 @@ public class SquareScript : MonoBehaviour
 
     void ClearGridColor()
     {
-        for (int x = 0; x < GridScript.Instance.gridSize; x++)
+        for (int x = 0; x < SpawnScript.Instance.gridSize; x++)
         {
-            for (int y = 0; y < GridScript.Instance.gridSize; y++)
+            for (int y = 0; y < SpawnScript.Instance.gridSize; y++)
             {
                 gridGO[x, y].GetComponent<SpriteRenderer>().color = Color.grey;
             }
@@ -212,7 +212,7 @@ public class SquareScript : MonoBehaviour
         {
             Vector2 closestGridLoc = new Vector2(Mathf.RoundToInt(this.transform.position.x), Mathf.RoundToInt(this.transform.position.y));
             Vector2 squarePos = closestGridLoc - this.relativePos + square.relativePos;
-            if (squarePos.x >= 0 && squarePos.x < GridScript.Instance.gridSize && squarePos.y >= 0 && squarePos.y < GridScript.Instance.gridSize)
+            if (squarePos.x >= 0 && squarePos.x < SpawnScript.Instance.gridSize && squarePos.y >= 0 && squarePos.y < SpawnScript.Instance.gridSize)
             {
                 Color gridPreviewColor;
                 if (CheckPosition(this.parentBlock.gameObject, closestGridLoc - this.relativePos))

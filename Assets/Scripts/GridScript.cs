@@ -15,15 +15,16 @@ public class GridScript : MonoBehaviour {
     #endregion
 
     public GameObject[,] gridGO;
-    public int gridSize;
     public Color gColor;
-
     public Color filledColor;
     public List<Vector2> filledListPos = new List<Vector2>();
 
+    int gridSize;
+
     void Start()
     {
-        gridGO = new GameObject[gridSize, gridSize];
+        gridSize = SpawnScript.Instance.gridSize;
+        gridGO = new GameObject[gridSize + 2, gridSize + 2];
         gColor = Color.grey;
 
         //Create the grid
@@ -46,12 +47,17 @@ public class GridScript : MonoBehaviour {
 
         foreach (Vector2 filledPos in filledListPos)
         {
-            int x = (int)filledPos.x;
-            int y = (int)filledPos.y;
-            gridGO[x, y].GetComponent<SpriteRenderer>().color = filledColor;
-            gridGO[x, y].GetComponent<SquareScript>().bNumber = -1;
-            gridGO[x, y].GetComponent<SquareScript>().sType = SquareType.GridFilled;
+            FillGrid(filledPos);
         }
+    }
+
+    public void FillGrid(Vector2 location)
+    {
+        int x = (int)location.x;
+        int y = (int)location.y;
+        gridGO[x, y].GetComponent<SpriteRenderer>().color = filledColor;
+        gridGO[x, y].GetComponent<SquareScript>().bNumber = -1;
+        gridGO[x, y].GetComponent<SquareScript>().sType = SquareType.GridFilled;
     }
 
     public bool CheckWin()

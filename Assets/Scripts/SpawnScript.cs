@@ -13,13 +13,24 @@ public class SpawnScript : MonoBehaviour {
     }
     #endregion
 
-    public List<GameObject> spawnLocations;
-    public List<GameObject> blocksList;
-    public float blockScale = 0.6f;
     public int blockSize = 3;
+    public int gridSize = 5;
 
-    void Awake () {
+    public List<GameObject> spawnLocations;
+    public List<GameObject> activeBlocksList;
+    public float blockScale = 0.6f;
+    public List<GameObject>[] blocksList;
+    
+
+    void Awake ()
+    {
         instance = this;
+        blocksList = new List<GameObject>[6];
+        for (int a = 0; a < blocksList.Length; a++)
+        {
+            blocksList[a] = new List<GameObject>();
+        }
+        getBlocks();
         int numberOfBlocks = GameObject.FindObjectsOfType<BlockScript>().Length;
 
         for (int n = 0; n < numberOfBlocks; n++)
@@ -28,15 +39,28 @@ public class SpawnScript : MonoBehaviour {
             spawn.transform.SetParent(GameObject.Find("Spawn Locations").transform);
             spawn.name = "Spawn " + (n + 1);
             spawn.tag = "Spawn";
-            spawn.transform.position = new Vector3(3 - 2f * (n % 3), 5 + ((n / 3) * 2), 0.5f);
+            spawn.transform.position = new Vector3(blockSize - 2f * (n % blockSize), gridSize + ((n / blockSize) * 2), 0);
 
             BoxCollider2D bc2d = spawn.GetComponent<BoxCollider2D>();          
-            bc2d.offset = new Vector2(blockScale, blockScale);
+            bc2d.offset = new Vector2((blockScale / 2) * (blockSize - 1), (blockScale / 2) * (blockSize - 1));
             bc2d.size = new Vector2(blockScale * blockSize, blockScale * blockSize);
 
             spawn.GetComponent<RotationScript>().bNumber = n;
             spawnLocations.Add(spawn);
-        }
-        
+        }       
 	}
+
+    void getBlocks()
+    {
+        for (int i = 2; i < 6; i++)
+        {
+            int j = 0;
+            Object[] blockFormats = (Object[])Resources.LoadAll(string.Format("Prefabs/Blocks/Block {0} squares", i));
+            foreach(GameObject block in blockFormats)
+            {
+                blocksList[i].Add(block as GameObject);
+                j++;
+            }
+        }
+    }
 }
