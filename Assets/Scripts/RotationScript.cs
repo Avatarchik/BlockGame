@@ -4,6 +4,7 @@ using System.Collections;
 public class RotationScript : MonoBehaviour
 {
     public int bNumber;
+    public GameObject block;
     float clickTime;
     float holdTime = 0.75f;
 
@@ -17,7 +18,8 @@ public class RotationScript : MonoBehaviour
     {
         if ((Time.time - clickTime > holdTime))
         {
-            SpawnScript.Instance.activeBlocksList[bNumber].GetComponent<BlockScript>().RotateMatrix(true);
+            block.GetComponent<BlockScript>().RotateMatrix(true);
+            block.transform.position = SpawnScript.Instance.spawnLocations[bNumber - 1].transform.position - Vector3.forward;
             clickTime = Time.time;
         }
     }

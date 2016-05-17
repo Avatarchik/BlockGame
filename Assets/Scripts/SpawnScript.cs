@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 public class SpawnScript : MonoBehaviour {
@@ -17,9 +16,9 @@ public class SpawnScript : MonoBehaviour {
     public int gridSize = 5;
 
     public List<GameObject> spawnLocations;
-    public List<GameObject> activeBlocksList;
-    public float blockScale = 0.6f;
     public List<GameObject>[] blocksList;
+    public int activeBlocksNumber;
+    public float blockScale = 0.6f;
     
 
     void Awake ()
@@ -31,11 +30,11 @@ public class SpawnScript : MonoBehaviour {
             blocksList[a] = new List<GameObject>();
         }
         getBlocks();
-        int numberOfBlocks = GameObject.FindObjectsOfType<BlockScript>().Length;
+        int numberOfBlocks =  9 /*GameObject.FindObjectsOfType<BlockScript>().Length*/;
 
         for (int n = 0; n < numberOfBlocks; n++)
         {
-            GameObject spawn = Instantiate(Resources.Load("Prefabs/SpawnHolder"), Vector3.zero, Quaternion.identity) as GameObject; ;
+            GameObject spawn = Instantiate(Resources.Load("Prefabs/SpawnHolder"), Vector3.zero, Quaternion.identity) as GameObject;
             spawn.transform.SetParent(GameObject.Find("Spawn Locations").transform);
             spawn.name = "Spawn " + (n + 1);
             spawn.tag = "Spawn";
@@ -54,12 +53,10 @@ public class SpawnScript : MonoBehaviour {
     {
         for (int i = 2; i < 6; i++)
         {
-            int j = 0;
             Object[] blockFormats = (Object[])Resources.LoadAll(string.Format("Prefabs/Blocks/Block {0} squares", i));
             foreach(GameObject block in blockFormats)
             {
                 blocksList[i].Add(block as GameObject);
-                j++;
             }
         }
     }

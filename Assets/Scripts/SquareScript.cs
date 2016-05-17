@@ -146,7 +146,7 @@ public class SquareScript : MonoBehaviour
             gridSquare.relativePos = square.relativePos;
             gridSquare.parentBlock = parentBlock.GetComponent<BlockScript>();
             gridSquare.bNumber = gridSquare.parentBlock.bNumber;
-            gridSquare.GetComponent<SpriteRenderer>().color = this.parentBlock.GetComponent<BlockScript>().bColor;
+            gridSquare.GetComponent<SpriteRenderer>().color = GridScript.Instance.blocksColor[bNumber];
             gridSquare.GetComponent<SpriteRenderer>().sortingLayerName = "block";
             parentBlock.GetComponent<BlockScript>().bPlaced = true;
             parentBlock.GetComponent<BlockScript>().bPos = destiny;

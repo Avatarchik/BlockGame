@@ -10,21 +10,25 @@ public class BlockScript : MonoBehaviour
     public string[] rotationIDs = new string[4];
     public int IDindex;
 
-    public Color bColor;
     public int[,] bMatrix;
-    public List<SquareScript> sList;
+    public List<SquareScript> sList = new List<SquareScript>();
     public int bNumber;
     public bool bPlaced;
     public Vector2 bPos;
-    
+
 
     void Awake()
     {
         maxBlockSize = SpawnScript.Instance.blockSize;
-        sList = new List<SquareScript>();;
         bMatrix = new int[maxBlockSize, maxBlockSize];
-        bNumber = SpawnScript.Instance.activeBlocksList.Count + 1;
-        CreateBlock();                    
+        SpawnScript.Instance.activeBlocksNumber++;
+        bNumber = SpawnScript.Instance.activeBlocksNumber;
+        
+        CreateBlock();
+        GetBlockIDs();
+        CreateBlockSprite();
+        transform.position = SpawnScript.Instance.spawnLocations[bNumber - 1].transform.position - Vector3.forward;
+        SpawnScript.Instance.spawnLocations[bNumber - 1].GetComponent<RotationScript>().block = this.gameObject;
     }
 
     void CreateBlock()
@@ -47,13 +51,11 @@ public class BlockScript : MonoBehaviour
                     break;
             }
         }
-        SpawnScript.Instance.activeBlocksList.Add(this.gameObject);
-        GetBlockIDs();
-        CreateBlockSprite();
     }
 
     public void CreateBlockSprite()
     {
+        Color color = GridScript.Instance.blocksColor[bNumber];
         for (int y = 0; y < SpawnScript.Instance.blockSize; y++)
         {
             for (int x = SpawnScript.Instance.blockSize - 1; x >= 0; x--)
@@ -62,7 +64,7 @@ public class BlockScript : MonoBehaviour
                 {
                     GameObject baseSquare = Instantiate(Resources.Load("Prefabs/Base Square")) as GameObject;
                     baseSquare.transform.localPosition = new Vector3(x, y, 0);
-                    baseSquare.GetComponent<SpriteRenderer>().color = bColor;
+                    baseSquare.GetComponent<SpriteRenderer>().color = color;
                     baseSquare.GetComponent<SpriteRenderer>().sortingLayerName = "blocks";
                     baseSquare.transform.parent = transform;
 
@@ -76,9 +78,7 @@ public class BlockScript : MonoBehaviour
                 }
             }
         }
-        //transform.position = SpawnScript.Instance.spawnLocations[bNumber - 1].transform.position - Vector3.forward;
         this.transform.localScale = new Vector3(SpawnScript.Instance.blockScale, SpawnScript.Instance.blockScale, 1f);
-                
     }
 
     public void DestroyBlockSprite()
@@ -87,7 +87,7 @@ public class BlockScript : MonoBehaviour
         var children = new List<GameObject>();
         foreach (Transform child in transform) children.Add(child.gameObject);
         children.ForEach(child => Destroy(child));
-        
+
     }
 
     public void RespawnBlock()
@@ -144,7 +144,16 @@ public class BlockScript : MonoBehaviour
             char[] removeChars = { '0' };
             rotationIDs[r] = rotationIDs[r].TrimEnd(removeChars);
 
-            RotateMatrix(true);
+            //Rotate block matrix
+            int[,] rotatedMatrix = new int[maxBlockSize, maxBlockSize];
+            int[,] originalMatrix = bMatrix;
+            
+            for (int x = 0; x < maxBlockSize; x++)
+                for (int y = 0; y < maxBlockSize; y++)
+                    rotatedMatrix[x, y] = originalMatrix[maxBlockSize - y - 1, x];
+
+            bMatrix = rotatedMatrix;
+            IDindex = (IDindex % 4);
         }
     }
 

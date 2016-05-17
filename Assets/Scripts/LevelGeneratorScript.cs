@@ -3,87 +3,55 @@ using System.Collections;
 
 public class LevelGeneratorScript : MonoBehaviour
 {
-
     int gridSize { get { return SpawnScript.Instance.gridSize; } }
     int blockSize { get { return SpawnScript.Instance.blockSize; } }
     GameObject[,] gridGO { get { return GridScript.Instance.gridGO; } set { GridScript.Instance.gridGO = value; } }
     public int gridFree;
-
-    //public IEnumerator TryMove(GameObject blockModel, Vector2 position)
-    //{
-    //    //Espera proximo frame para fazer Start() do bloco e garar sList
-    //    yield return new WaitForFixedUpdate();
-
-    //    ////Rotaciona o bloco 0 a 3 vezes
-    //    //for (int r = 0; r < Random.Range(0, 4); r++)
-    //    //    blockModel.GetComponent<BlockScript>().RotateMatrix(true);
-
-    //    //int pontoX = Random.Range(0, gridSize - (blockSize - 1));
-    //    //int pontoY = Random.Range(0, gridSize - (blockSize - 1));
-
-
-    //    string gridSpace = GridLocID(position);
-    //    int nBlocks = gridSpace.Split('1').Length - 1;
-    //    nBlocks = Mathf.Clamp(nBlocks, 0, 5);
-    //    Debug.Log(nBlocks);
-    //    if (nBlocks <= 1)
-    //        yield break;
-
-    //    foreach (GameObject block in SpawnScript.Instance.blocksList[nBlocks])
-    //    {
-    //        for (int r = 0; r < 4; r++)
-    //        {
-    //            block.GetComponent<BlockScript>().RotateMatrix(true);
-    //            if (block.GetComponent<BlockScript>().blockID == gridSpace)
-    //            {
-    //                if (CheckPosition(blockModel, position))
-    //                {
-    //                    MoveBlockGrid(blockModel, position);
-    //                    blockModel.transform.localScale = Vector3.one;
-    //                    Debug.Log(blockModel + "posicionado em " + position.x + " " + position.y);
-    //                    gridFree -= blockModel.GetComponent<BlockScript>().sList.Count;
-    //                }
-    //                else
-    //                    Destroy(blockModel);
-
-    //            }
-    //        }
-    //    }
-
-
-
-    //}
 
     void Start()
     {
         gridFree = gridSize * gridSize;
     }
 
+    public void Click1()
+    {
+        for (int i = 0; i <= gridSize - blockSize; i++)
+            for (int j = 0; j <= gridSize - blockSize; j++)
+            {
+                Debug.Log(GridLocID(new Vector2(i, j)));
+                CompleteGrid(i, j);
+            }
+                
+
+        FillEmptyGrid();
+    }
 
     public void Click2()
     {
         for (int n = 0; n < 100; n++)
         {
-            Vector2 ponto = new Vector2(Random.Range(0, gridSize), Random.Range(0, gridSize));
+            Vector2 ponto = new Vector2(Random.Range(0, (gridSize - blockSize) + 1), Random.Range(0, (gridSize - blockSize) + 1));
 
+            int squaresNumber = Random.Range(4, 6);
+            GameObject block = SpawnScript.Instance.blocksList[squaresNumber][Random.Range(0, SpawnScript.Instance.blocksList[squaresNumber].Count)] as GameObject;
+            GameObject randomBlock = Instantiate(block, SpawnScript.Instance.spawnLocations[SpawnScript.Instance.activeBlocksNumber].transform.position, Quaternion.identity) as GameObject;
 
-            GameObject block = SpawnScript.Instance.blocksList[5][Random.Range(0, SpawnScript.Instance.blocksList[5].Count)] as GameObject;
-            GameObject randomBlock = Instantiate(block);
+            for (int rot = 0; rot < Random.Range(0, 5); rot++)
+                randomBlock.GetComponent<BlockScript>().RotateMatrix(true);
 
             if (CheckPosition(randomBlock, ponto))
             {
                 MoveBlockGrid(randomBlock, ponto);
-                randomBlock.transform.localScale = Vector3.one;
-                randomBlock.transform.position = Vector3.zero;
                 Debug.Log(randomBlock + "posicionado em " + ponto.x + " " + ponto.y);
                 gridFree -= randomBlock.GetComponent<BlockScript>().sList.Count;
             }
             else
+            {
+                SpawnScript.Instance.activeBlocksNumber--;
                 Destroy(randomBlock);
-        }
+            }
 
-        Debug.Log("--------------------------");
-        CompleteGrid();
+        }
     }
 
     //Cria string de um local 3x3 do grid. 1 = livre, 0 = ocupado
@@ -110,55 +78,61 @@ public class LevelGeneratorScript : MonoBehaviour
     }
 
     //Checa todos os espaços 3x3 do grid e tenta preencher com um bloco
-    void CompleteGrid()
+    void CompleteGrid(int i, int j)
     {
         bool teste = false;
-        for (int i = 0; i < 3; i++)
+        string gridSpace = GridLocID(new Vector2(i, j));
+        int nBlocks = gridSpace.Split('1').Length - 1;
+
+        if (nBlocks >= 2 && nBlocks <= 5)
         {
-            for (int j = 0; j < 3; j++)
+            foreach (GameObject block in SpawnScript.Instance.blocksList[nBlocks])
             {
-                string gridSpace = GridLocID(new Vector2(i, j));
-                int nBlocks = gridSpace.Split('1').Length - 1;
-
-                if (nBlocks >= 2 && nBlocks <= 5)
+                GameObject blockGO = Instantiate(block, SpawnScript.Instance.spawnLocations[SpawnScript.Instance.activeBlocksNumber].transform.position, Quaternion.identity) as GameObject;
+                for (int r = 0; r < 4; r++)
                 {
-                    foreach (GameObject block in SpawnScript.Instance.blocksList[nBlocks])
+                    if (gridSpace == blockGO.GetComponent<BlockScript>().rotationIDs[r])
                     {
-                        GameObject blockGO = Instantiate(block);
-                        for (int r = 0; r < 4; r++)
+                        for (int rotations = r; rotations > 0; rotations--)
+                            blockGO.GetComponent<BlockScript>().RotateMatrix(true);
+
+
+                        for (int x = -2; x < blockSize; x++)
                         {
-                            if (gridSpace == blockGO.GetComponent<BlockScript>().rotationIDs[r])
+                            for (int y = -2; y < blockSize; y++)
                             {
-                                for (int rotations = r; rotations > 0; rotations--)
-                                    blockGO.GetComponent<BlockScript>().RotateMatrix(true);
-
-
-                                for (int x = 0; x < blockSize; x++)
+                                if ((i + x >= 0) && (i + x < gridSize) && (j + y >= 0) && (j + y < gridSize) && !teste)
                                 {
-                                    for (int y = 0; y < blockSize; y++)
+                                    if (CheckPosition(blockGO, new Vector2(i + x, j + y)))
                                     {
-                                        if (CheckPosition(blockGO, new Vector2(i + x, j + y)))
-                                        {
-                                            MoveBlockGrid(blockGO, new Vector2(i + x, j + y));
-                                            blockGO.transform.localScale = Vector3.one;
-                                            blockGO.transform.position = Vector3.zero;
-                                            Debug.Log(blockGO + "posicionado em " + (i + x).ToString() + " " + (j + y).ToString());
-                                            teste = true;
-                                            gridFree -= blockGO.GetComponent<BlockScript>().sList.Count;
-                                        }
+                                        MoveBlockGrid(blockGO, new Vector2(i + x, j + y));
+                                        Debug.Log(blockGO + "completado em " + (i + x).ToString() + " " + (j + y).ToString());
+                                        teste = true;
+                                        gridFree -= blockGO.GetComponent<BlockScript>().sList.Count;
                                     }
                                 }
-
                             }
                         }
-                        if (!teste)
-                            Destroy(blockGO);
-                        teste = false;
+
                     }
                 }
-                gridSpace = GridLocID(new Vector2(i, j));
-                nBlocks = gridSpace.Split('1').Length - 1;
-                if (nBlocks == 1)
+                if (!teste)
+                {
+                    SpawnScript.Instance.activeBlocksNumber--;
+                    Destroy(blockGO);
+                }
+                teste = false;
+            }
+        }
+    }
+
+    void FillEmptyGrid()
+    {
+        for (int i = 0; i < gridSize; i++)
+        {
+            for (int j = 0; j < gridSize; j++)
+            {
+                if (GridScript.Instance.gridGO[i, j].GetComponent<SquareScript>().sType == SquareType.GridEmpty)
                     GridScript.Instance.FillGrid(new Vector2(i, j));
             }
         }
@@ -190,7 +164,7 @@ public class LevelGeneratorScript : MonoBehaviour
 
     void MoveBlockGrid(GameObject blockGO, Vector2 destiny)
     {
-        Color color = Random.ColorHSV();
+        Color color = GridScript.Instance.blocksColor[SpawnScript.Instance.activeBlocksNumber];
         foreach (SquareScript square in blockGO.GetComponent<BlockScript>().sList)
         {
             Vector2 pos = destiny + square.relativePos;
@@ -205,8 +179,9 @@ public class LevelGeneratorScript : MonoBehaviour
             blockGO.GetComponent<BlockScript>().bPlaced = true;
             blockGO.GetComponent<BlockScript>().bPos = destiny;
 
-            square.transform.position = new Vector3(5 + square.relativePos.x, square.relativePos.y, 0f);
+            square.transform.localPosition = new Vector3(square.relativePos.x, square.relativePos.y, -1);
         }
+        blockGO.transform.position = SpawnScript.Instance.spawnLocations[blockGO.GetComponent<BlockScript>().bNumber - 1].transform.position - Vector3.forward;
 
     }
 }

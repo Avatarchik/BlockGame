@@ -17,6 +17,7 @@ public class GridScript : MonoBehaviour {
     public GameObject[,] gridGO;
     public Color gColor;
     public Color filledColor;
+    public Color[] blocksColor = new Color[10];
     public List<Vector2> filledListPos = new List<Vector2>();
 
     int gridSize;
