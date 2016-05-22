@@ -15,6 +15,11 @@ public class SpawnScript : MonoBehaviour {
     public int blockSize = 3;
     public int gridSize = 5;
 
+    int spawnColumns;
+    float spawnSpacingX;
+    float spawnSpacingY;
+    Vector3 spawnPos;
+
     public List<GameObject> spawnLocations;
     public List<GameObject>[] blocksList;
     public int activeBlocksNumber;
@@ -24,13 +29,14 @@ public class SpawnScript : MonoBehaviour {
     void Awake ()
     {
         instance = this;
+        FixCamera();
         blocksList = new List<GameObject>[6];
         for (int a = 0; a < blocksList.Length; a++)
         {
             blocksList[a] = new List<GameObject>();
         }
         getBlocks();
-        int numberOfBlocks =  9 /*GameObject.FindObjectsOfType<BlockScript>().Length*/;
+        int numberOfBlocks = 2 * gridSize;
 
         for (int n = 0; n < numberOfBlocks; n++)
         {
@@ -38,13 +44,14 @@ public class SpawnScript : MonoBehaviour {
             spawn.transform.SetParent(GameObject.Find("Spawn Locations").transform);
             spawn.name = "Spawn " + (n + 1);
             spawn.tag = "Spawn";
-            spawn.transform.position = new Vector3(blockSize - 2f * (n % blockSize), gridSize + ((n / blockSize) * 2), 0);
+            Vector3 pos = new Vector3(-spawnSpacingX * (n % spawnColumns), ((n / spawnColumns) * spawnSpacingY), 0);
+            spawn.transform.position = pos + spawnPos;
 
             BoxCollider2D bc2d = spawn.GetComponent<BoxCollider2D>();          
             bc2d.offset = new Vector2((blockScale / 2) * (blockSize - 1), (blockScale / 2) * (blockSize - 1));
             bc2d.size = new Vector2(blockScale * blockSize, blockScale * blockSize);
 
-            spawn.GetComponent<RotationScript>().bNumber = n;
+            spawn.GetComponent<RotationScript>().bNumber = n + 1;
             spawnLocations.Add(spawn);
         }       
 	}
@@ -58,6 +65,45 @@ public class SpawnScript : MonoBehaviour {
             {
                 blocksList[i].Add(block as GameObject);
             }
+        }
+    }
+
+    void FixCamera()
+    {
+        Camera cam = GameObject.FindObjectOfType<Camera>();
+
+        switch (gridSize)
+        {
+            case 4:
+                cam.transform.position = new Vector3(1.5f, 3.5f, -10);
+                cam.orthographicSize = 5f;
+
+                spawnColumns = 3;
+                spawnSpacingX = 1.75f;
+                spawnSpacingY = 1.75f;
+                spawnPos = new Vector3(2.75f, 4f);
+                blockScale = 0.5f;
+                break;
+            case 5:
+                cam.transform.position = new Vector3(2f, 5f, -10);
+                cam.orthographicSize = 6.5f;
+
+                spawnColumns = 3;
+                spawnSpacingX = 2f;
+                spawnSpacingY = 2f;
+                spawnPos = new Vector3(3.5f, 5f);
+                blockScale = 0.55f;
+                break;
+            case 6:
+                cam.transform.position = new Vector3(2.5f, 5f, -10);
+                cam.orthographicSize = 6.5f;
+
+                spawnColumns = 4;
+                spawnSpacingX = 1.75f;
+                spawnSpacingY = 1.75f;
+                spawnPos = new Vector3(4.6f, 6f);
+                blockScale = 0.5f;
+                break;
         }
     }
 }

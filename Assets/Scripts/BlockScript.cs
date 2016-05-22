@@ -8,10 +8,12 @@ public class BlockScript : MonoBehaviour
     int[] bLocations;
     int maxBlockSize;
     public string[] rotationIDs = new string[4];
+    public Vector2[] bOffsets;
     public int IDindex;
 
     public int[,] bMatrix;
     public List<SquareScript> sList = new List<SquareScript>();
+    
     public int bNumber;
     public bool bPlaced;
     public Vector2 bPos;
@@ -21,6 +23,7 @@ public class BlockScript : MonoBehaviour
     {
         maxBlockSize = SpawnScript.Instance.blockSize;
         bMatrix = new int[maxBlockSize, maxBlockSize];
+        bOffsets = new Vector2[4];
         SpawnScript.Instance.activeBlocksNumber++;
         bNumber = SpawnScript.Instance.activeBlocksNumber;
         
@@ -55,7 +58,7 @@ public class BlockScript : MonoBehaviour
 
     public void CreateBlockSprite()
     {
-        Color color = GridScript.Instance.blocksColor[bNumber];
+        Color color = GridScript.Instance.blocksColor[bNumber - 1];
         for (int y = 0; y < SpawnScript.Instance.blockSize; y++)
         {
             for (int x = SpawnScript.Instance.blockSize - 1; x >= 0; x--)
@@ -119,6 +122,7 @@ public class BlockScript : MonoBehaviour
             }
         }
         bMatrix = rotatedMatrix;
+        IDindex++;
         IDindex = (IDindex % 4);
         RespawnBlock();
     }
@@ -136,6 +140,7 @@ public class BlockScript : MonoBehaviour
                     if (bMatrix[x, y] == bNumber)
                     {
                         bID += (int)Mathf.Pow(2, bitPos);
+                        bOffsets[r] = new Vector2(x, y);
                     }
                     bitPos++;
                 }

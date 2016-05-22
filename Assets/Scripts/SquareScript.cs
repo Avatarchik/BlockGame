@@ -17,7 +17,7 @@ public class SquareScript : MonoBehaviour
     GameObject[,] gridGO { get { return GridScript.Instance.gridGO; } set { GridScript.Instance.gridGO = value; } }
 
     float clickTime;
-    float holdTime = 0.75f;
+    float holdTime = 0.5f;
 
 
 //#if UNITY_EDITOR
@@ -35,7 +35,7 @@ public class SquareScript : MonoBehaviour
 
         if (this.sType == SquareType.Block)
         {
-            if (((curPosition - originalPos).sqrMagnitude <= 0.1f) && !parentBlock.bPlaced)
+            if ((((curPosition - originalPos).sqrMagnitude <= 0.1f) && !parentBlock.bPlaced))
             {
                 if ((Time.time - clickTime > holdTime))
                 {

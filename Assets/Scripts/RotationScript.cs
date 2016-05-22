@@ -6,7 +6,7 @@ public class RotationScript : MonoBehaviour
     public int bNumber;
     public GameObject block;
     float clickTime;
-    float holdTime = 0.75f;
+    float holdTime = 0.5f;
 
 
     void OnMouseDown()
