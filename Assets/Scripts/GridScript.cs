@@ -34,16 +34,10 @@ public class GridScript : MonoBehaviour {
         {
             for (int y = 0; y < gridSize; y++)
             {
-                gridGO[x, y] = Instantiate(Resources.Load("Prefabs/Base Square"), new Vector3(x, y, 1f), Quaternion.identity) as GameObject;
-                gridGO[x, y].GetComponent<SpriteRenderer>().sortingLayerName = "grid";
-                gridGO[x, y].GetComponent<SpriteRenderer>().color = gColor;
+                gridGO[x, y] = Instantiate(Resources.Load("Prefabs/Base Grid Square"), new Vector3(x, y, 1f), Quaternion.identity) as GameObject;
                 gridGO[x, y].transform.parent = GameObject.Find("Grid").transform;
                 gridGO[x, y].name = ("grid pos " + x + "," + y);
-                SquareScript baseSquareSS = gridGO[x, y].GetComponent<SquareScript>();
-                baseSquareSS.sType = SquareType.GridEmpty;
-                baseSquareSS.squareGridPos = new Vector2(x, y);
-                baseSquareSS.parentBlock = null;
-                baseSquareSS.bNumber = 0;
+                gridGO[x, y].GetComponent<GridTile>().gridPos = new Vector2(x, y);
             }
         }
 
@@ -58,8 +52,7 @@ public class GridScript : MonoBehaviour {
         int x = (int)location.x;
         int y = (int)location.y;
         gridGO[x, y].GetComponent<SpriteRenderer>().color = filledColor;
-        gridGO[x, y].GetComponent<SquareScript>().bNumber = -1;
-        gridGO[x, y].GetComponent<SquareScript>().sType = SquareType.GridFilled;
+        gridGO[x, y].GetComponent<GridTile>().gType = GridType.Filled;
     }
 
     public bool CheckWin()
@@ -68,7 +61,7 @@ public class GridScript : MonoBehaviour {
         {
             for (int y = 0; y < gridSize; y++)
             {
-                if (gridGO[x, y].GetComponent<SquareScript>().bNumber == 0)
+                if (gridGO[x, y].GetComponent<GridTile>().bNumber == 0)
                     return false;
             }
         }

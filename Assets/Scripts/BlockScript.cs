@@ -12,11 +12,12 @@ public class BlockScript : MonoBehaviour
     public int IDindex;
 
     public int[,] bMatrix;
-    public List<SquareScript> sList = new List<SquareScript>();
+    public List<BlockTile> tileList = new List<BlockTile>();
     
     public int bNumber;
     public bool bPlaced;
     public Vector2 bPos;
+    public Color bColor;
 
 
     void Awake()
@@ -58,51 +59,40 @@ public class BlockScript : MonoBehaviour
 
     public void CreateBlockSprite()
     {
-        Color color = GridScript.Instance.blocksColor[bNumber - 1];
+        bColor = GridScript.Instance.blocksColor[bNumber - 1];
         for (int y = 0; y < SpawnScript.Instance.blockSize; y++)
         {
             for (int x = SpawnScript.Instance.blockSize - 1; x >= 0; x--)
             {
                 if (bMatrix[x, y] == bNumber)
                 {
-                    GameObject baseSquare = Instantiate(Resources.Load("Prefabs/Base Square")) as GameObject;
+                    GameObject baseSquare = Instantiate(Resources.Load("Prefabs/Base Block Square")) as GameObject;
                     baseSquare.transform.localPosition = new Vector3(x, y, 0);
-                    baseSquare.GetComponent<SpriteRenderer>().color = color;
-                    baseSquare.GetComponent<SpriteRenderer>().sortingLayerName = "blocks";
+                    baseSquare.GetComponent<SpriteRenderer>().color = bColor;
                     baseSquare.transform.parent = transform;
 
-                    SquareScript sScript = baseSquare.GetComponent<SquareScript>();
-                    sScript.relativePos = new Vector2(x, y);
-                    sScript.sType = SquareType.Block;
-                    sScript.parentBlock = this;
-                    sScript.bNumber = bNumber;
-                    baseSquare.name = this.gameObject.name + sScript.relativePos.ToString();
-                    sList.Add(sScript);
+                    BlockTile bTile = baseSquare.GetComponent<BlockTile>();
+                    bTile.relativePos = new Vector2(x, y);
+                    bTile.parentBlock = this;
+                    bTile.bNumber = bNumber;
+                    baseSquare.name = this.gameObject.name + bTile.relativePos.ToString();
+                    tileList.Add(bTile);
                 }
             }
         }
         this.transform.localScale = new Vector3(SpawnScript.Instance.blockScale, SpawnScript.Instance.blockScale, 1f);
         bPlaced = false;
-    }
-
-    public void DestroyBlockSprite()
-    {
-        sList.Clear();
-        var children = new List<GameObject>();
-        foreach (Transform child in transform) children.Add(child.gameObject);
-        children.ForEach(child => Destroy(child));
-
-    }
+    }  
 
     public void RespawnBlock()
     {
         DestroyBlockSprite();
         CreateBlockSprite();
 
-        foreach (SquareScript square in sList)
+        foreach (BlockTile bTile in tileList)
         {
-            square.transform.localPosition = square.relativePos;
-            square.transform.localScale = new Vector3(0.9f, 0.9f, 0);
+            bTile.transform.localPosition = bTile.relativePos;
+            bTile.transform.localScale = new Vector3(0.9f, 0.9f, 0);
         }
     }
 
@@ -126,6 +116,15 @@ public class BlockScript : MonoBehaviour
         IDindex++;
         IDindex = (IDindex % 4);
         RespawnBlock();
+    }
+
+
+    void DestroyBlockSprite()
+    {
+        tileList.Clear();
+        var children = new List<GameObject>();
+        foreach (Transform child in transform) children.Add(child.gameObject);
+        children.ForEach(child => Destroy(child));
     }
 
     void GetBlockIDs()

@@ -82,7 +82,7 @@ public class LevelGeneratorScript : MonoBehaviour
         {
             for (int x = posX + (blockSize - 1); x >= posX; x--)
             {
-                if (gridGO[x, y].GetComponent<SquareScript>().sType == SquareType.GridEmpty)
+                if (gridGO[x, y].GetComponent<GridTile>().gType == GridType.Empty)
                 {
                     bID += (int)Mathf.Pow(2, bitPos);
                     gridOffset = new Vector2(x, y);
@@ -143,7 +143,7 @@ public class LevelGeneratorScript : MonoBehaviour
         {
             for (int j = 0; j < gridSize; j++)
             {
-                if (GridScript.Instance.gridGO[i, j].GetComponent<SquareScript>().sType == SquareType.GridEmpty)
+                if (GridScript.Instance.gridGO[i, j].GetComponent<GridTile>().gType == GridType.Empty)
                 {
                     GridScript.Instance.filledListPos.Add(new Vector2(i, j));
                     GridScript.Instance.FillGrid(new Vector2(i, j));
@@ -157,7 +157,7 @@ public class LevelGeneratorScript : MonoBehaviour
     bool CheckPosition(GameObject blockGO, Vector2 destiny)
     {
 
-        foreach (SquareScript square in blockGO.GetComponent<BlockScript>().sList)
+        foreach (BlockTile square in blockGO.GetComponent<BlockScript>().tileList)
         {
             //Bloco esta dentro do grid?
             Vector2 squarePos = destiny + square.relativePos;
@@ -168,7 +168,7 @@ public class LevelGeneratorScript : MonoBehaviour
             }
 
             //Existem outros blocos la?
-            if (GridScript.Instance.gridGO[(int)squarePos.x, (int)squarePos.y].GetComponent<SquareScript>().sType != SquareType.GridEmpty)
+            if (GridScript.Instance.gridGO[(int)squarePos.x, (int)squarePos.y].GetComponent<GridTile>().gType != GridType.Empty)
             {
                 //Debug.Log("Não pode ser colocado " + blockGO + " em " + destiny.x + "," + destiny.y + " pois ja existe um bloco la");
                 blockGO.GetComponent<BlockScript>().bPlaced = false;
@@ -181,13 +181,12 @@ public class LevelGeneratorScript : MonoBehaviour
     void MoveBlockGrid(GameObject blockGO, Vector2 destiny)
     {
         Color color = GridScript.Instance.blocksColor[SpawnScript.Instance.activeBlocksNumber - 1];
-        foreach (SquareScript square in blockGO.GetComponent<BlockScript>().sList)
+        foreach (BlockTile square in blockGO.GetComponent<BlockScript>().tileList)
         {
             Vector2 pos = destiny + square.relativePos;
-            SquareScript gridSquare = GridScript.Instance.gridGO[(int)pos.x, (int)pos.y].GetComponent<SquareScript>();
-            gridSquare.sType = SquareType.GridUsed;
-            gridSquare.squareGridPos = pos;
-            gridSquare.relativePos = square.relativePos;
+            GridTile gridSquare = GridScript.Instance.gridGO[(int)pos.x, (int)pos.y].GetComponent<GridTile>();
+            gridSquare.gType = GridType.Used;
+            gridSquare.gridPos = pos;
             gridSquare.parentBlock = blockGO.GetComponent<BlockScript>();
             gridSquare.bNumber = gridSquare.parentBlock.bNumber;
             gridSquare.GetComponent<SpriteRenderer>().color = color;
