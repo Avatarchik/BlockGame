@@ -19,6 +19,7 @@ public class GridScript : MonoBehaviour {
     public Color filledColor;
     public Color[] blocksColor = new Color[10];
     public List<Vector2> filledListPos = new List<Vector2>();
+    public bool paused;
 
     int gridSize;
 
@@ -77,7 +78,7 @@ public class GridScript : MonoBehaviour {
 
     public void WinEvent()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("scene 2");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Level Selector");
         
     }
 }

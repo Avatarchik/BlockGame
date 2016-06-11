@@ -11,16 +11,21 @@ public class RotationScript : MonoBehaviour
 
     void OnMouseDown()
     {
-        clickTime = Time.time;
+        if (!GridScript.Instance.paused)
+            clickTime = Time.time;
     }
 
     void OnMouseDrag()
     {
-        if ((Time.time - clickTime > holdTime))
+        if (!GridScript.Instance.paused)
         {
-            block.GetComponent<BlockScript>().RotateMatrix(true);
-            block.transform.position = SpawnScript.Instance.spawnLocations[bNumber - 1].transform.position - Vector3.forward;
-            clickTime = Time.time;
+            if ((Time.time - clickTime > holdTime))
+            {
+                block.GetComponent<BlockScript>().RotateMatrix(true);
+                block.transform.position = SpawnScript.Instance.spawnLocations[bNumber - 1].transform.position - Vector3.forward;
+                clickTime = Time.time;
+            }
         }
+
     }
 }

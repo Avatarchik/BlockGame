@@ -20,94 +20,80 @@ public class SquareScript : MonoBehaviour
     float holdTime = 0.5f;
 
 
-//#if UNITY_EDITOR
     void OnMouseDown()
     {
-        offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
-        originalPos = gameObject.transform.position;
-        clickTime = Time.time;
+        if (!GridScript.Instance.paused)
+        {
+            offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
+            originalPos = gameObject.transform.position;
+            clickTime = Time.time;
+        }
     }
- 
+
     void OnMouseDrag()
     {
-        Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
-        Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
-
-        if (this.sType == SquareType.Block)
+        if (!GridScript.Instance.paused)
         {
-            if ((((curPosition - originalPos).sqrMagnitude <= 0.1f) && !parentBlock.bPlaced))
-            {
-                if ((Time.time - clickTime > holdTime))
-                {
-                    clickTime = Time.time;
-                    parentBlock.RotateMatrix(true);
-                }
-            }
-            else
-            {
-                parentBlock.transform.localScale = Vector3.one;
-                RemoveBlockGrid(parentBlock.bNumber);
-                ClearGridColor();
+            Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
+            Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
 
-                //Traz o bloco para frente na camera
-                Vector3 blockPosition = new Vector3(curPosition.x - (transform.localPosition.x * parentBlock.transform.localScale.x), curPosition.y - (transform.localPosition.y * parentBlock.transform.localScale.x), -1f);
-                parentBlock.transform.position = blockPosition;
-                PaintGridPreview();
+            if (this.sType == SquareType.Block)
+            {
+                if ((((curPosition - originalPos).sqrMagnitude <= 0.1f) && !parentBlock.bPlaced))
+                {
+                    if ((Time.time - clickTime > holdTime))
+                    {
+                        clickTime = Time.time;
+                        parentBlock.RotateMatrix(true);
+                    }
+                }
+                else
+                {
+                    parentBlock.transform.localScale = Vector3.one;
+                    RemoveBlockGrid(parentBlock.bNumber);
+                    ClearGridColor();
+
+                    //Traz o bloco para frente na camera
+                    Vector3 blockPosition = new Vector3(curPosition.x - (transform.localPosition.x * parentBlock.transform.localScale.x), curPosition.y - (transform.localPosition.y * parentBlock.transform.localScale.x), -1f);
+                    parentBlock.transform.position = blockPosition;
+                    PaintGridPreview();
+                }
             }
         }
     }
 
     void OnMouseUp()
     {
-        if (this.sType == SquareType.Block)
+        if (!GridScript.Instance.paused)
         {
-            Vector2 closestGridLoc = new Vector2(Mathf.RoundToInt(this.transform.position.x), Mathf.RoundToInt(this.transform.position.y));
-
-            if (CheckPosition(this.parentBlock.gameObject, closestGridLoc - this.relativePos))
-                MoveBlockGrid(this.parentBlock.gameObject, closestGridLoc);
-
-            else
+            if (this.sType == SquareType.Block)
             {
-                RemoveBlockGrid(parentBlock.bNumber);
-                parentBlock.bPlaced = false;
+                Vector2 closestGridLoc = new Vector2(Mathf.RoundToInt(this.transform.position.x), Mathf.RoundToInt(this.transform.position.y));
 
-                parentBlock.transform.localPosition = SpawnScript.Instance.spawnLocations[parentBlock.bNumber - 1].transform.position;
-                parentBlock.gameObject.transform.localScale = new Vector3(SpawnScript.Instance.blockScale, SpawnScript.Instance.blockScale, 1f);
-            }
-            if (GridScript.Instance.CheckWin())
-            {
-                Debug.Log("Voce ganhou!!");
-                GridScript.Instance.WinEvent();
-            }
+                if (CheckPosition(this.parentBlock.gameObject, closestGridLoc - this.relativePos))
+                    MoveBlockGrid(this.parentBlock.gameObject, closestGridLoc);
 
+                else
+                {
+                    RemoveBlockGrid(parentBlock.bNumber);
+                    parentBlock.bPlaced = false;
+
+                    Vector3 spawnPos = SpawnScript.Instance.spawnLocations[parentBlock.bNumber - 1].transform.position;
+                    parentBlock.transform.localPosition = new Vector3(spawnPos.x, spawnPos.y, -1);
+                    parentBlock.gameObject.transform.localScale = new Vector3(SpawnScript.Instance.blockScale, SpawnScript.Instance.blockScale, 1f);
+                }
+                if (GridScript.Instance.CheckWin())
+                {
+                    Debug.Log("Voce ganhou!!");
+                    GridScript.Instance.WinEvent();
+                }
+
+            }
+            ClearGridColor();
         }
-        ClearGridColor();
     }
 
-//#else
-//    void Update()
-//    {
-//        if (Input.touchCount > 0)
-//        {
-//            totalTime += Input.GetTouch(0).deltaTime;
-
-//            if (totalTime >= holdTime)
-//            {
-//                //Long tap
-//                Debug.Log("long tap");
-//            }
-
-//            if (Input.GetTouch(0).phase == TouchPhase.Ended) 
-//            {
-//                Debug.Log("short tap");
-//                totalTime = 0;
-//            }
-//        }
-//    }
-    
-//#endif
-
-#region Private
+    #region Private
     //Checa se o bloco pode ser posicionado em certo local
     bool CheckPosition(GameObject blockGO, Vector2 destiny)
     {
@@ -137,6 +123,7 @@ public class SquareScript : MonoBehaviour
     //Move bloco para posição do grid
     void MoveBlockGrid(GameObject blockGO, Vector2 destiny)
     {
+        Color color = GridScript.Instance.blocksColor[SpawnScript.Instance.activeBlocksNumber - 1];
         foreach (SquareScript square in parentBlock.sList)
         {
             Vector2 pos = (destiny - relativePos) + square.relativePos;
@@ -146,7 +133,7 @@ public class SquareScript : MonoBehaviour
             gridSquare.relativePos = square.relativePos;
             gridSquare.parentBlock = parentBlock.GetComponent<BlockScript>();
             gridSquare.bNumber = gridSquare.parentBlock.bNumber;
-            gridSquare.GetComponent<SpriteRenderer>().color = GridScript.Instance.blocksColor[bNumber];
+            gridSquare.GetComponent<SpriteRenderer>().color = color;
             gridSquare.GetComponent<SpriteRenderer>().sortingLayerName = "block";
             parentBlock.GetComponent<BlockScript>().bPlaced = true;
             parentBlock.GetComponent<BlockScript>().bPos = destiny;
@@ -222,7 +209,7 @@ public class SquareScript : MonoBehaviour
 
                 gridGO[Mathf.RoundToInt(squarePos.x), Mathf.RoundToInt(squarePos.y)].GetComponent<SpriteRenderer>().color = gridPreviewColor;
             }
-        }            
+        }
     }
-#endregion
+    #endregion
 }

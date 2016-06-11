@@ -82,6 +82,7 @@ public class BlockScript : MonoBehaviour
             }
         }
         this.transform.localScale = new Vector3(SpawnScript.Instance.blockScale, SpawnScript.Instance.blockScale, 1f);
+        bPlaced = false;
     }
 
     public void DestroyBlockSprite()
