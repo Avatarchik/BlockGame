@@ -31,12 +31,8 @@ public class SpawnScript : MonoBehaviour {
         instance = this;
         FixCamera();
         blocksList = new List<GameObject>[6];
-        for (int a = 0; a < blocksList.Length; a++)
-        {
-            blocksList[a] = new List<GameObject>();
-        }
-        getBlocks();
-        int numberOfBlocks = 2 * gridSize;
+        
+        int numberOfBlocks = 3 * GameManager.Instance.gridSize;
 
         for (int n = 0; n < numberOfBlocks; n++)
         {
@@ -51,22 +47,12 @@ public class SpawnScript : MonoBehaviour {
             bc2d.offset = new Vector2((blockScale / 2) * (blockSize - 1), (blockScale / 2) * (blockSize - 1));
             bc2d.size = new Vector2(blockScale * blockSize, blockScale * blockSize);
 
-            spawn.GetComponent<RotationScript>().bNumber = n + 1;
+            //spawn.GetComponent<RotationScript>().bNumber = n + 1;
             spawnLocations.Add(spawn);
         }       
 	}
 
-    void getBlocks()
-    {
-        for (int i = 2; i < 6; i++)
-        {
-            Object[] blockFormats = (Object[])Resources.LoadAll(string.Format("Prefabs/Blocks/Block {0} squares", i));
-            foreach(GameObject block in blockFormats)
-            {
-                blocksList[i].Add(block as GameObject);
-            }
-        }
-    }
+    
 
     void FixCamera()
     {

@@ -15,7 +15,7 @@ public class GridScript : MonoBehaviour {
     #endregion
 
     public GameObject[,] gridGO;
-    public Color gColor;
+
     public Color filledColor;
     public Color[] blocksColor = new Color[10];
     public List<Vector2> filledListPos = new List<Vector2>();
@@ -25,9 +25,8 @@ public class GridScript : MonoBehaviour {
 
     void Start()
     {
-        gridSize = SpawnScript.Instance.gridSize;
+        gridSize = GameManager.Instance.gridSize;
         gridGO = new GameObject[gridSize + 2, gridSize + 2];
-        gColor = Color.grey;
 
         //Create the grid
         for (int x = 0; x < gridSize; x++)
@@ -57,16 +56,16 @@ public class GridScript : MonoBehaviour {
 
     public bool CheckWin()
     {
-        for (int x = 0; x < gridSize; x++)
-        {
-            for (int y = 0; y < gridSize; y++)
-            {
-                if (gridGO[x, y].GetComponent<GridTile>().bNumber == 0)
-                    return false;
-            }
-        }
+        //for (int x = 0; x < gridSize; x++)
+        //{
+        //    for (int y = 0; y < gridSize; y++)
+        //    {
+        //        if (gridGO[x, y].GetComponent<GridTile>().bNumber == 0)
+        //            return false;
+        //    }
+        //}
 
-        return true;
+        return false;
     }
 
     public void WinEvent()
