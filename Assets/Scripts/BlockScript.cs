@@ -30,7 +30,7 @@ public class BlockScript : MonoBehaviour
         transform.position = SpawnScript.Instance.spawnLocations[bNumber].transform.position - Vector3.forward;
         SpawnScript.Instance.spawnLocations[bNumber].GetComponent<RotationScript>().block = gameObject;
 
-        if (tileList.Capacity == 0)
+        if (tileList.Count == 0)
         {
             bMatrix = new int[3, 3];
             CreateBlock();

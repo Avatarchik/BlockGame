@@ -19,9 +19,38 @@ public class GameManager : MonoBehaviour {
 
     public int gridSize;
     public int blockSize;
+    public int tilesLeft;
 
     public List<GameObject> activeBlocks = new List<GameObject>();
     public List<GameObject>[] allBlocks = new List<GameObject>[6];
+
+    #region Notifications
+    public void OnEnable()
+    {
+        this.AddObserver(BlockPlaced, BlockTile.BlockPlaced);
+        this.AddObserver(BlockRemoved, BlockTile.BlockRemoved);
+    }
+
+    public void OnDisable()
+    {
+        this.RemoveObserver(BlockPlaced, BlockTile.BlockPlaced);
+        this.RemoveObserver(BlockRemoved, BlockTile.BlockRemoved);
+    }
+
+    void BlockPlaced(object sender, object info)
+    {
+        GameObject block = info as GameObject;
+        tilesLeft -= block.GetComponent<BlockScript>().tileList.Count;
+        Debug.Log(block.name + " was placed");
+    }
+
+    void BlockRemoved(object sender, object info)
+    {
+        GameObject block = info as GameObject;
+        tilesLeft += block.GetComponent<BlockScript>().tileList.Count;
+        Debug.Log(block.name + " was removed");
+    }
+    #endregion
 
     void Awake()
     {
@@ -43,4 +72,5 @@ public class GameManager : MonoBehaviour {
             }
         }
     }
+
 }

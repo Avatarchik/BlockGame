@@ -13,7 +13,7 @@ public class SpawnScript : MonoBehaviour {
     #endregion
 
     public int blockSize = 3;
-    public int gridSize = 5;
+    public int gridSize;
 
     int spawnColumns;
     float spawnSpacingX;
@@ -21,24 +21,23 @@ public class SpawnScript : MonoBehaviour {
     Vector3 spawnPos;
 
     public List<GameObject> spawnLocations;
-    public List<GameObject>[] blocksList;
-    public int activeBlocksNumber;
     public float blockScale = 0.6f;
     
 
     void Awake ()
     {
         instance = this;
+
+        gridSize = GameManager.Instance.gridSize;
         FixCamera();
-        blocksList = new List<GameObject>[6];
         
-        int numberOfBlocks = 3 * GameManager.Instance.gridSize;
+        int numberOfBlocks = 2 * GameManager.Instance.gridSize;
 
         for (int n = 0; n < numberOfBlocks; n++)
         {
             GameObject spawn = Instantiate(Resources.Load("Prefabs/SpawnHolder"), Vector3.zero, Quaternion.identity) as GameObject;
             spawn.transform.SetParent(GameObject.Find("Spawn Locations").transform);
-            spawn.name = "Spawn " + (n + 1);
+            spawn.name = "Spawn " + n;
             spawn.tag = "Spawn";
             Vector3 pos = new Vector3(-spawnSpacingX * (n % spawnColumns), ((n / spawnColumns) * spawnSpacingY), 0);
             spawn.transform.position = pos + spawnPos;
@@ -47,12 +46,10 @@ public class SpawnScript : MonoBehaviour {
             bc2d.offset = new Vector2((blockScale / 2) * (blockSize - 1), (blockScale / 2) * (blockSize - 1));
             bc2d.size = new Vector2(blockScale * blockSize, blockScale * blockSize);
 
-            //spawn.GetComponent<RotationScript>().bNumber = n + 1;
+            spawn.GetComponent<RotationScript>().bNumber = n;
             spawnLocations.Add(spawn);
         }       
 	}
-
-    
 
     void FixCamera()
     {

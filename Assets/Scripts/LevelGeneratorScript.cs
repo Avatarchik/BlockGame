@@ -11,7 +11,6 @@ public class LevelGeneratorScript : MonoBehaviour
     public List<Vector2> filledListPos = new List<Vector2>();
     Vector2 gridOffset;
 
-
     public void Click1()
     {
 
@@ -33,7 +32,7 @@ public class LevelGeneratorScript : MonoBehaviour
 
     public void Click2()
     {
-        Instantiate(Resources.Load(string.Format("Prefabs/Block {0}/{1}", 3, "Block Lp")));
+
     }
 
     #region Private
@@ -91,6 +90,7 @@ public class LevelGeneratorScript : MonoBehaviour
     {
         string gridSpace = GridLocID(i, j);
         int nTiles = gridSpace.Split('1').Length - 1;
+        bool placed = false;
 
         if (nTiles >= 2 && nTiles <= 5)
         {
@@ -99,7 +99,7 @@ public class LevelGeneratorScript : MonoBehaviour
                 GameObject block = GameManager.Instance.allBlocks[nTiles][n];
                 for (int r = 0; r < 4; r++)
                 {
-                    if (gridSpace == block.GetComponent<BlockScript>().rotID[r])
+                    if (gridSpace == block.GetComponent<BlockScript>().rotID[r] && !placed)
                     {
                         Debug.Log(block);
                         string blockID = block.name;
@@ -118,7 +118,7 @@ public class LevelGeneratorScript : MonoBehaviour
                             blockGO.transform.parent = GameObject.Find("Blocks").transform;
                             MoveBlockGrid(blockGO, gridOffset - bs.rotPos[r]);
                             Debug.Log(blockGO + "completado em " + (new Vector2(i, j)).ToString());
-                            return;
+                            placed = true;
                         }
                     }
                 }
@@ -136,12 +136,12 @@ public class LevelGeneratorScript : MonoBehaviour
                 if (GridScript.Instance.gridGO[i, j].GetComponent<GridTile>().gType == GridType.Empty)
                 {
                     GridScript.Instance.filledListPos.Add(new Vector2(i, j));
-                    GridScript.Instance.FillGrid(new Vector2(i, j));
                 }
 
             }
         }
         filledListPos = GridScript.Instance.filledListPos;
+        GridScript.Instance.FillGrid();
     }
 
     bool CheckPosition(GameObject blockGO, Vector2 destiny)

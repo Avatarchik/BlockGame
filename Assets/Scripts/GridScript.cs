@@ -25,10 +25,15 @@ public class GridScript : MonoBehaviour {
 
     void Start()
     {
+        CreateGrid();
+        GameManager.Instance.tilesLeft = (gridSize * gridSize) - filledListPos.Count;
+    }
+
+    void CreateGrid()
+    {
         gridSize = GameManager.Instance.gridSize;
         gridGO = new GameObject[gridSize + 2, gridSize + 2];
 
-        //Create the grid
         for (int x = 0; x < gridSize; x++)
         {
             for (int y = 0; y < gridSize; y++)
@@ -40,37 +45,18 @@ public class GridScript : MonoBehaviour {
             }
         }
 
+        FillGrid();
+    }
+
+    public void FillGrid()
+    {
         foreach (Vector2 filledPos in filledListPos)
         {
-            FillGrid(filledPos);
-        }
+            int x = (int)filledPos.x;
+            int y = (int)filledPos.y;
+            gridGO[x, y].GetComponent<SpriteRenderer>().color = filledColor;
+            gridGO[x, y].GetComponent<GridTile>().gType = GridType.Filled;
+        }      
     }
 
-    public void FillGrid(Vector2 location)
-    {
-        int x = (int)location.x;
-        int y = (int)location.y;
-        gridGO[x, y].GetComponent<SpriteRenderer>().color = filledColor;
-        gridGO[x, y].GetComponent<GridTile>().gType = GridType.Filled;
-    }
-
-    public bool CheckWin()
-    {
-        //for (int x = 0; x < gridSize; x++)
-        //{
-        //    for (int y = 0; y < gridSize; y++)
-        //    {
-        //        if (gridGO[x, y].GetComponent<GridTile>().bNumber == 0)
-        //            return false;
-        //    }
-        //}
-
-        return false;
-    }
-
-    public void WinEvent()
-    {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Level Selector");
-        
-    }
 }

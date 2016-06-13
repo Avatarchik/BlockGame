@@ -5,7 +5,6 @@ public class BlockTile : Tile
 {
     public Vector2 relativePos;
 
-
     Vector3 screenPoint;
     Vector3 offset;
     Vector3 originalPos;
@@ -14,6 +13,9 @@ public class BlockTile : Tile
     float clickTime;
     float holdTime = 0.5f;
     bool blockMoved;
+
+    public const string BlockPlaced = "BlockTile.BlockPlaced";
+    public const string BlockRemoved = "BlockTile.BlockRemoved";
 
     void OnMouseDown()
     {
@@ -68,8 +70,8 @@ public class BlockTile : Tile
 
             Vector2 closestGridLoc = new Vector2(Mathf.RoundToInt(this.transform.position.x), Mathf.RoundToInt(this.transform.position.y));
 
-            if (CheckPosition(this.parentBlock.gameObject, closestGridLoc - this.relativePos))
-                MoveBlockGrid(this.parentBlock.gameObject, closestGridLoc);
+            if (CheckPosition(parentBlock.gameObject, closestGridLoc - this.relativePos))
+                MoveBlockGrid(parentBlock.gameObject, closestGridLoc);
 
             else
             {
@@ -80,15 +82,9 @@ public class BlockTile : Tile
                 parentBlock.transform.localPosition = new Vector3(spawnPos.x, spawnPos.y, -1);
                 parentBlock.gameObject.transform.localScale = new Vector3(SpawnScript.Instance.blockScale, SpawnScript.Instance.blockScale, 1f);
             }
-            if (GridScript.Instance.CheckWin())
-            {
-                Debug.Log("Voce ganhou!!");
-                GridScript.Instance.WinEvent();
-            }
 
         }
         ClearGridColor();
-
     }
 
 
@@ -111,7 +107,7 @@ public class BlockTile : Tile
             Vector2 relPos = destiny + square.relativePos;
             if (gridGO[(int)relPos.x, (int)relPos.y].GetComponent<GridTile>().gType != GridType.Empty)
             {
-                Debug.Log("Não pode ser colocado " + blockGO + " em " + destiny.x + "," + destiny.y + " pois ja existe um bloco la");
+                //Debug.Log("Não pode ser colocado " + blockGO + " em " + destiny.x + "," + destiny.y + " pois ja existe um bloco la");
                 blockGO.GetComponent<BlockScript>().bPlaced = false;
                 return false;
             }
@@ -139,37 +135,31 @@ public class BlockTile : Tile
             bTile.transform.position = new Vector3(Mathf.RoundToInt(bTile.transform.position.x), Mathf.RoundToInt(bTile.transform.position.y), 0f);
             bTile.GetComponent<SpriteRenderer>().sortingOrder = -1;
         }
+        this.PostNotification(BlockPlaced, blockGO);
     }
 
     //Remove todos os blocos do grid com o bNumber 
     void RemoveBlockGrid(int blockNumber)
     {
-        for (int x = 0; x < SpawnScript.Instance.gridSize; x++)
+        GameObject block = GameManager.Instance.activeBlocks[blockNumber];
+        for (int x = 0; x < GameManager.Instance.gridSize; x++)
         {
-            for (int y = 0; y < SpawnScript.Instance.gridSize; y++)
+            for (int y = 0; y < GameManager.Instance.gridSize; y++)
             {
                 if (gridGO[x, y].GetComponent<GridTile>().bNumber == blockNumber)
                 {
-                    gridGO[x, y].GetComponent<SpriteRenderer>().sortingLayerName = "grid";
-                    gridGO[x, y].GetComponent<SpriteRenderer>().color = Color.grey;
-                    gridGO[x, y].transform.parent = GameObject.Find("Grid").transform;
-                    gridGO[x, y].name = ("grid pos " + x + "," + y);
                     GridTile gTile = gridGO[x, y].GetComponent<GridTile>();
                     gTile.gType = GridType.Empty;
-                    gTile.gridPos = new Vector2(x, y);
+                    gTile.parentBlock = null;
+                    gTile.bNumber = -1;
                 }
-
             }
         }
+        if (block.GetComponent<BlockScript>().bPlaced)
+            this.PostNotification(BlockRemoved, parentBlock.gameObject);
 
-        foreach (Vector2 filledPos in GridScript.Instance.filledListPos)
-        {
-            int x = (int)filledPos.x;
-            int y = (int)filledPos.y;
-            gridGO[x, y].GetComponent<SpriteRenderer>().color = GridScript.Instance.filledColor;
-            gridGO[x, y].GetComponent<GridTile>().bNumber = -1;
-            gridGO[x, y].GetComponent<GridTile>().gType = GridType.Filled;
-        }
+        block.GetComponent<BlockScript>().bPlaced = false;
+        GridScript.Instance.FillGrid();
     }
 
     void ClearGridColor()
