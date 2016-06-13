@@ -6,36 +6,119 @@ public class BlockScript : MonoBehaviour
 {
     [SerializeField]
     int[] bLocations;
-    int maxBlockSize;
-    public string[] rotationIDs = new string[4];
-    public Vector2[] bOffsets;
-    public int IDindex;
-
     public int[,] bMatrix;
-    public List<SquareScript> sList = new List<SquareScript>();
-    
+
+    public List<BlockTile> tileList = new List<BlockTile>();
     public int bNumber;
     public bool bPlaced;
     public Vector2 bPos;
 
+    public int rotIndex;
+    public string[] rotID = new string[4];
+    public Vector2[] rotPos = new Vector2[4];
+
+    public Color bColor;
+
 
     void Awake()
     {
-        maxBlockSize = SpawnScript.Instance.blockSize;
-        bMatrix = new int[maxBlockSize, maxBlockSize];
-        bOffsets = new Vector2[4];
-        SpawnScript.Instance.activeBlocksNumber++;
-        bNumber = SpawnScript.Instance.activeBlocksNumber;
-        
-        CreateBlock();
-        GetBlockIDs();
+        bNumber = GameManager.Instance.activeBlocks.Count;
+        GameManager.Instance.activeBlocks.Add(gameObject);
+
+        bColor = GridScript.Instance.blocksColor[bNumber];
+
+        transform.position = SpawnScript.Instance.spawnLocations[bNumber].transform.position - Vector3.forward;
+        SpawnScript.Instance.spawnLocations[bNumber].GetComponent<RotationScript>().block = gameObject;
+
+        if (tileList.Count == 0)
+        {
+            bMatrix = new int[3, 3];
+            CreateBlock();
+            GetBlockIDs();
+            CreateBlockSprite();
+        }
+
+        foreach (BlockTile bTile in tileList)
+            bTile.GetComponent<SpriteRenderer>().color = bColor;
+    }
+
+    public void RotateBlock()
+    {
+        rotIndex++;
+        rotIndex = rotIndex % 4;
+        RespawnBlock();
+    }
+
+    void CreateBlockSprite()
+    {
+        bColor = GridScript.Instance.blocksColor[bNumber];
+
+        int x = (int)rotPos[rotIndex].x;
+        int y = (int)rotPos[rotIndex].y;
+
+        for (int n = 0; n < rotID[rotIndex].Length; n++)
+        {
+            if (rotID[rotIndex][n] == '1')
+            {
+                GameObject baseSquare = Instantiate(Resources.Load("Prefabs/Base Block Square")) as GameObject;
+                baseSquare.transform.localPosition = new Vector3(x, y, 0);
+                baseSquare.GetComponent<SpriteRenderer>().color = bColor;
+                baseSquare.transform.parent = transform;
+
+                BlockTile bTile = baseSquare.GetComponent<BlockTile>();
+                bTile.relativePos = new Vector2(x, y);
+                bTile.parentBlock = this;
+                bTile.bNumber = bNumber;
+                baseSquare.name = this.gameObject.name + bTile.relativePos.ToString();
+                tileList.Add(bTile);
+            }
+
+            x++;
+            if (x >= 3 && y >= 0)
+            {
+                x = 0;
+                y--;
+            }
+        }
+
+
+        this.transform.localScale = new Vector3(SpawnScript.Instance.blockScale, SpawnScript.Instance.blockScale, 1f);
+        bPlaced = false;
+
+        foreach (BlockTile bTile in tileList)
+        {
+            bTile.GetComponent<SpriteRenderer>().color = bColor;
+            bTile.transform.localPosition = bTile.relativePos;
+            bTile.transform.localScale = new Vector3(0.9f, 0.9f, 0);
+        }
+    }
+
+    void RespawnBlock()
+    {
+        DestroyBlockSprite();
         CreateBlockSprite();
-        transform.position = SpawnScript.Instance.spawnLocations[bNumber - 1].transform.position - Vector3.forward;
-        SpawnScript.Instance.spawnLocations[bNumber - 1].GetComponent<RotationScript>().block = this.gameObject;
+
+        foreach (BlockTile bTile in tileList)
+        {
+            bTile.transform.localPosition = bTile.relativePos;
+            bTile.transform.localScale = new Vector3(0.9f, 0.9f, 0);
+        }
+    }
+
+    void DestroyBlockSprite()
+    {
+        tileList.Clear();
+        var children = new List<GameObject>();
+        foreach (Transform child in transform) children.Add(child.gameObject);
+        children.ForEach(child => Destroy(child));
     }
 
     void CreateBlock()
     {
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+                bMatrix[i, j] = -1;
+
         foreach (int loc in bLocations)
         {
             switch (loc)
@@ -56,110 +139,38 @@ public class BlockScript : MonoBehaviour
         }
     }
 
-    public void CreateBlockSprite()
-    {
-        Color color = GridScript.Instance.blocksColor[bNumber - 1];
-        for (int y = 0; y < SpawnScript.Instance.blockSize; y++)
-        {
-            for (int x = SpawnScript.Instance.blockSize - 1; x >= 0; x--)
-            {
-                if (bMatrix[x, y] == bNumber)
-                {
-                    GameObject baseSquare = Instantiate(Resources.Load("Prefabs/Base Square")) as GameObject;
-                    baseSquare.transform.localPosition = new Vector3(x, y, 0);
-                    baseSquare.GetComponent<SpriteRenderer>().color = color;
-                    baseSquare.GetComponent<SpriteRenderer>().sortingLayerName = "blocks";
-                    baseSquare.transform.parent = transform;
-
-                    SquareScript sScript = baseSquare.GetComponent<SquareScript>();
-                    sScript.relativePos = new Vector2(x, y);
-                    sScript.sType = SquareType.Block;
-                    sScript.parentBlock = this;
-                    sScript.bNumber = bNumber;
-                    baseSquare.name = this.gameObject.name + sScript.relativePos.ToString();
-                    sList.Add(sScript);
-                }
-            }
-        }
-        this.transform.localScale = new Vector3(SpawnScript.Instance.blockScale, SpawnScript.Instance.blockScale, 1f);
-    }
-
-    public void DestroyBlockSprite()
-    {
-        sList.Clear();
-        var children = new List<GameObject>();
-        foreach (Transform child in transform) children.Add(child.gameObject);
-        children.ForEach(child => Destroy(child));
-
-    }
-
-    public void RespawnBlock()
-    {
-        DestroyBlockSprite();
-        CreateBlockSprite();
-
-        foreach (SquareScript square in sList)
-        {
-            square.transform.localPosition = square.relativePos;
-            square.transform.localScale = new Vector3(0.9f, 0.9f, 0);
-        }
-    }
-
-    public void RotateMatrix(bool clockwise)
-    {
-        int[,] rotatedMatrix = new int[maxBlockSize, maxBlockSize];
-        int[,] originalMatrix = bMatrix;
-
-        //Rotate block matrix
-        for (int x = 0; x < maxBlockSize; x++)
-        {
-            for (int y = 0; y < maxBlockSize; y++)
-            {
-                if (clockwise)
-                    rotatedMatrix[x, y] = originalMatrix[maxBlockSize - y - 1, x];
-                else
-                    rotatedMatrix[x, y] = originalMatrix[y, maxBlockSize - x - 1];
-            }
-        }
-        bMatrix = rotatedMatrix;
-        IDindex++;
-        IDindex = (IDindex % 4);
-        RespawnBlock();
-    }
-
     void GetBlockIDs()
     {
         for (int r = 0; r < 4; r++)
         {
             int bitPos = 0;
             int bID = 0;
-            for (int y = 0; y < SpawnScript.Instance.blockSize; y++)
+            for (int y = 0; y < 3; y++)
             {
-                for (int x = SpawnScript.Instance.blockSize - 1; x >= 0; x--)
+                for (int x = 3 - 1; x >= 0; x--)
                 {
                     if (bMatrix[x, y] == bNumber)
                     {
                         bID += (int)Mathf.Pow(2, bitPos);
-                        bOffsets[r] = new Vector2(x, y);
+                        rotPos[r] = new Vector2(x, y);
                     }
                     bitPos++;
                 }
             }
-            rotationIDs[r] = System.Convert.ToString(bID, 2);
+            rotID[r] = System.Convert.ToString(bID, 2);
             char[] removeChars = { '0' };
-            rotationIDs[r] = rotationIDs[r].TrimEnd(removeChars);
+            rotID[r] = rotID[r].TrimEnd(removeChars);
 
             //Rotate block matrix
-            int[,] rotatedMatrix = new int[maxBlockSize, maxBlockSize];
+            int[,] rotatedMatrix = new int[3, 3];
             int[,] originalMatrix = bMatrix;
-            
-            for (int x = 0; x < maxBlockSize; x++)
-                for (int y = 0; y < maxBlockSize; y++)
-                    rotatedMatrix[x, y] = originalMatrix[maxBlockSize - y - 1, x];
+
+            for (int x = 0; x < 3; x++)
+                for (int y = 0; y < 3; y++)
+                    rotatedMatrix[x, y] = originalMatrix[3 - y - 1, x];
 
             bMatrix = rotatedMatrix;
-            IDindex = (IDindex % 4);
+            rotIndex = (rotIndex % 4);
         }
     }
-
 }

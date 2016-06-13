@@ -15,69 +15,48 @@ public class GridScript : MonoBehaviour {
     #endregion
 
     public GameObject[,] gridGO;
-    public Color gColor;
+
     public Color filledColor;
     public Color[] blocksColor = new Color[10];
     public List<Vector2> filledListPos = new List<Vector2>();
+    public bool paused;
 
     int gridSize;
 
     void Start()
     {
-        gridSize = SpawnScript.Instance.gridSize;
-        gridGO = new GameObject[gridSize + 2, gridSize + 2];
-        gColor = Color.grey;
+        CreateGrid();
+        GameManager.Instance.tilesLeft = (gridSize * gridSize) - filledListPos.Count;
+    }
 
-        //Create the grid
+    void CreateGrid()
+    {
+        gridSize = GameManager.Instance.gridSize;
+        gridGO = new GameObject[gridSize + 2, gridSize + 2];
+
         for (int x = 0; x < gridSize; x++)
         {
             for (int y = 0; y < gridSize; y++)
             {
-                gridGO[x, y] = Instantiate(Resources.Load("Prefabs/Base Square"), new Vector3(x, y, 1f), Quaternion.identity) as GameObject;
-                gridGO[x, y].GetComponent<SpriteRenderer>().sortingLayerName = "grid";
-                gridGO[x, y].GetComponent<SpriteRenderer>().color = gColor;
+                gridGO[x, y] = Instantiate(Resources.Load("Prefabs/Base Grid Square"), new Vector3(x, y, 1f), Quaternion.identity) as GameObject;
                 gridGO[x, y].transform.parent = GameObject.Find("Grid").transform;
                 gridGO[x, y].name = ("grid pos " + x + "," + y);
-                SquareScript baseSquareSS = gridGO[x, y].GetComponent<SquareScript>();
-                baseSquareSS.sType = SquareType.GridEmpty;
-                baseSquareSS.squareGridPos = new Vector2(x, y);
-                baseSquareSS.parentBlock = null;
-                baseSquareSS.bNumber = 0;
+                gridGO[x, y].GetComponent<GridTile>().gridPos = new Vector2(x, y);
             }
         }
 
+        FillGrid();
+    }
+
+    public void FillGrid()
+    {
         foreach (Vector2 filledPos in filledListPos)
         {
-            FillGrid(filledPos);
-        }
+            int x = (int)filledPos.x;
+            int y = (int)filledPos.y;
+            gridGO[x, y].GetComponent<SpriteRenderer>().color = filledColor;
+            gridGO[x, y].GetComponent<GridTile>().gType = GridType.Filled;
+        }      
     }
 
-    public void FillGrid(Vector2 location)
-    {
-        int x = (int)location.x;
-        int y = (int)location.y;
-        gridGO[x, y].GetComponent<SpriteRenderer>().color = filledColor;
-        gridGO[x, y].GetComponent<SquareScript>().bNumber = -1;
-        gridGO[x, y].GetComponent<SquareScript>().sType = SquareType.GridFilled;
-    }
-
-    public bool CheckWin()
-    {
-        for (int x = 0; x < gridSize; x++)
-        {
-            for (int y = 0; y < gridSize; y++)
-            {
-                if (gridGO[x, y].GetComponent<SquareScript>().bNumber == 0)
-                    return false;
-            }
-        }
-
-        return true;
-    }
-
-    public void WinEvent()
-    {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("scene 2");
-        
-    }
 }
