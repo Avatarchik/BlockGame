@@ -24,17 +24,22 @@ public class GameManager : MonoBehaviour {
     public List<GameObject> activeBlocks = new List<GameObject>();
     public List<GameObject>[] allBlocks = new List<GameObject>[6];
 
+    public float rotationSpeed = 3;
+    public bool rotatingBlock;
+
     #region Notifications
     public void OnEnable()
     {
         this.AddObserver(BlockPlaced, BlockTile.BlockPlaced);
         this.AddObserver(BlockRemoved, BlockTile.BlockRemoved);
+        this.AddObserver(RotateBlock, BlockTile.RotateBlock);
     }
 
     public void OnDisable()
     {
         this.RemoveObserver(BlockPlaced, BlockTile.BlockPlaced);
         this.RemoveObserver(BlockRemoved, BlockTile.BlockRemoved);
+        this.RemoveObserver(RotateBlock, BlockTile.RotateBlock);
     }
 
     void BlockPlaced(object sender, object info)
@@ -49,6 +54,13 @@ public class GameManager : MonoBehaviour {
         GameObject block = info as GameObject;
         tilesLeft += block.GetComponent<BlockScript>().tileList.Count;
         Debug.Log(block.name + " was removed");
+    }
+
+    void RotateBlock(object sender, object info)
+    {
+        GameObject block = info as GameObject;
+        StartCoroutine("Rotate", block);
+        Debug.Log(block.name + " was rotated");
     }
     #endregion
 
@@ -73,4 +85,19 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    IEnumerator Rotate(GameObject block)
+    {
+        rotatingBlock = true;
+        int bNumber = block.GetComponent<BlockScript>().bNumber;
+        Transform spawnLoc = SpawnScript.Instance.spawnLocations[bNumber].transform;
+        for (float i = 0; i < 90 / rotationSpeed; i++)
+        {
+            block.transform.RotateAround(spawnLoc.position + new Vector3(0.55f, 0.55f, 0), Vector3.forward, -rotationSpeed);
+            yield return null;
+        }
+        block.transform.position = spawnLoc.position - Vector3.forward;
+        block.transform.rotation = Quaternion.Euler(Vector3.zero);
+        block.GetComponent<BlockScript>().RotateBlock();
+        rotatingBlock = false;
+    }
 }

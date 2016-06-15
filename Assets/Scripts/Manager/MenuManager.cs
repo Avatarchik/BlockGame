@@ -38,6 +38,9 @@ public class MenuManager : MonoBehaviour {
     {
         Scene scene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(scene.name);
+        Time.timeScale = 1f;
+        pauseMenuCanvas.SetActive(false);
+        GridScript.Instance.paused = false;
     }
 
     public void GoToLevelSelector()

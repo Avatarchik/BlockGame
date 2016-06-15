@@ -4,14 +4,19 @@ using System.Collections;
 public class RotationScript : MonoBehaviour
 {
     public int bNumber;
-    public GameObject block;
+    public GameObject parentBlock;
+    public float rotationSpeed = 3;
+
     float clickTime;
     float holdTime = 0.5f;
+    bool rotating;
+
+    public const string RotateBlock = "BlockTile.RotateBlock";
 
     void Start()
     {
-        if (block)
-            bNumber = block.GetComponent<BlockScript>().bNumber;
+        if (parentBlock)
+            bNumber = parentBlock.GetComponent<BlockScript>().bNumber;
     }
 
     void OnMouseDown()
@@ -24,10 +29,9 @@ public class RotationScript : MonoBehaviour
     {
         if (!GridScript.Instance.paused)
         {
-            if ((Time.time - clickTime > holdTime))
+            if (Time.time - clickTime > holdTime)
             {
-                block.GetComponent<BlockScript>().RotateBlock();
-                block.transform.position = SpawnScript.Instance.spawnLocations[bNumber].transform.position - Vector3.forward;
+                this.PostNotification(RotateBlock, parentBlock);
                 clickTime = Time.time;
             }
         }

@@ -28,7 +28,7 @@ public class BlockScript : MonoBehaviour
         bColor = GridScript.Instance.blocksColor[bNumber];
 
         transform.position = SpawnScript.Instance.spawnLocations[bNumber].transform.position - Vector3.forward;
-        SpawnScript.Instance.spawnLocations[bNumber].GetComponent<RotationScript>().block = gameObject;
+        SpawnScript.Instance.spawnLocations[bNumber].GetComponent<RotationScript>().parentBlock = gameObject;
 
         if (tileList.Count == 0)
         {
@@ -40,6 +40,8 @@ public class BlockScript : MonoBehaviour
 
         foreach (BlockTile bTile in tileList)
             bTile.GetComponent<SpriteRenderer>().color = bColor;
+
+        RespawnBlock();
     }
 
     public void RotateBlock()
@@ -100,7 +102,6 @@ public class BlockScript : MonoBehaviour
 
         foreach (BlockTile bTile in tileList)
         {
-            bTile.transform.localPosition = bTile.relativePos;
             bTile.transform.localScale = new Vector3(0.9f, 0.9f, 0);
         }
     }

@@ -9,6 +9,7 @@ public class LevelGeneratorScript : MonoBehaviour
     GameObject[,] gridGO { get { return GridScript.Instance.gridGO; } set { GridScript.Instance.gridGO = value; } }
 
     public List<Vector2> filledListPos = new List<Vector2>();
+    public LevelLoader ll;
     Vector2 gridOffset;
 
     public void Click1()
@@ -32,7 +33,7 @@ public class LevelGeneratorScript : MonoBehaviour
 
     public void Click2()
     {
-
+        ll.LoadValues();
     }
 
     #region Private

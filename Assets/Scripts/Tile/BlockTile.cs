@@ -16,6 +16,7 @@ public class BlockTile : Tile
 
     public const string BlockPlaced = "BlockTile.BlockPlaced";
     public const string BlockRemoved = "BlockTile.BlockRemoved";
+    public const string RotateBlock = "BlockTile.RotateBlock";
 
     void OnMouseDown()
     {
@@ -30,7 +31,7 @@ public class BlockTile : Tile
 
     void OnMouseDrag()
     {
-        if (!GridScript.Instance.paused)
+        if (!GridScript.Instance.paused && !GameManager.Instance.rotatingBlock)
         {
             Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
             Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
@@ -39,8 +40,8 @@ public class BlockTile : Tile
             {
                 if ((Time.time - clickTime > holdTime))
                 {
+                    this.PostNotification(RotateBlock, parentBlock.gameObject);
                     clickTime = Time.time;
-                    parentBlock.RotateBlock();
                 }
             }
             else
@@ -65,7 +66,7 @@ public class BlockTile : Tile
 
     void OnMouseUp()
     {
-        if (!GridScript.Instance.paused)
+        if (!GridScript.Instance.paused && !GameManager.Instance.rotatingBlock)
         {
 
             Vector2 closestGridLoc = new Vector2(Mathf.RoundToInt(this.transform.position.x), Mathf.RoundToInt(this.transform.position.y));
