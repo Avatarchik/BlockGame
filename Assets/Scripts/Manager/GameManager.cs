@@ -68,6 +68,13 @@ public class GameManager : MonoBehaviour {
     {
         instance = this;
         getAllBlocks();
+
+        if (GameObject.FindObjectOfType<Game>())
+        {
+            Game game = GameObject.FindObjectOfType<Game>();
+            gridS.filledListPos = game.filledListPos;
+            gridSize = game.gridSize;
+        }
     }
 
     void getAllBlocks()

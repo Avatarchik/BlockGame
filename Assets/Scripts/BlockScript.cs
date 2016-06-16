@@ -19,6 +19,9 @@ public class BlockScript : MonoBehaviour
 
     public Color bColor;
 
+    public Vector2 resolutionPos;
+    public int resolutionIndex;
+
 
     void Awake()
     {

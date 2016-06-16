@@ -9,16 +9,13 @@ public class LevelGeneratorScript : MonoBehaviour
     GameObject[,] gridGO { get { return GridScript.Instance.gridGO; } set { GridScript.Instance.gridGO = value; } }
 
     public List<Vector2> filledListPos = new List<Vector2>();
-    public LevelLoader ll;
+    public int level;
     Vector2 gridOffset;
 
-    public void Click1()
+    void Start()
     {
-
         for (int n = 0; n < 100; n++)
-        {
             PlaceRandomBlocks();
-        }
 
         Debug.Log("--------------------------------");
 
@@ -29,12 +26,30 @@ public class LevelGeneratorScript : MonoBehaviour
 
         FillEmptyGrid();
 
+        foreach (GameObject block in GameManager.Instance.activeBlocks)
+        {
+            for (int r = 0; r < Random.Range(0, 5); r++)
+                block.GetComponent<BlockScript>().RotateBlock();
+
+            block.GetComponent<BlockScript>().bPlaced = false;
+            block.GetComponent<BlockScript>().bPos = Vector2.zero;
+        }
+    }
+
+    public void Click1()
+    {
+        
     }
 
     public void Click2()
     {
-        ll.LoadValues();
-    }
+        var levelLoader = new GameObject();
+        var game = levelLoader.AddComponent<Game>();
+        game.LoadValues();
+        game.levelNumber = level;
+        levelLoader.name = "Level " + game.gridSize + "x" + level;
+        GameObject.Find("Blocks").transform.parent = levelLoader.transform;
+    }      
 
     #region Private
     //Tenta colocar blocos de 4 ou 5 squares em uma posição aleatoria no grid
@@ -53,7 +68,7 @@ public class LevelGeneratorScript : MonoBehaviour
         {
             block.transform.parent = GameObject.Find("Blocks").transform;
             MoveBlockGrid(block, ponto);
-            Debug.Log(block + "posicionado em " + ponto.x + " " + ponto.y);
+            Debug.Log(block.name + "posicionado em " + ponto.x + " " + ponto.y);
         }
         else
         {
@@ -102,7 +117,6 @@ public class LevelGeneratorScript : MonoBehaviour
                 {
                     if (gridSpace == block.GetComponent<BlockScript>().rotID[r] && !placed)
                     {
-                        Debug.Log(block);
                         string blockID = block.name;
                         char[] removeChars = { ' ', '(', ')', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
                         blockID = blockID.TrimEnd(removeChars);
@@ -118,7 +132,7 @@ public class LevelGeneratorScript : MonoBehaviour
                         {
                             blockGO.transform.parent = GameObject.Find("Blocks").transform;
                             MoveBlockGrid(blockGO, gridOffset - bs.rotPos[r]);
-                            Debug.Log(blockGO + "completado em " + (new Vector2(i, j)).ToString());
+                            Debug.Log(blockGO.name + "completado em " + (new Vector2(i, j)).ToString());
                             placed = true;
                         }
                     }
@@ -184,6 +198,8 @@ public class LevelGeneratorScript : MonoBehaviour
             gridSquare.GetComponent<SpriteRenderer>().sortingLayerName = "block";
             blockGO.GetComponent<BlockScript>().bPlaced = true;
             blockGO.GetComponent<BlockScript>().bPos = destiny;
+            blockGO.GetComponent<BlockScript>().resolutionPos = destiny;
+            blockGO.GetComponent<BlockScript>().resolutionIndex = blockGO.GetComponent<BlockScript>().rotIndex;
 
             square.transform.localPosition = new Vector3(square.relativePos.x, square.relativePos.y, -1);
         }

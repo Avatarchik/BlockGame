@@ -31,7 +31,7 @@ public class SpawnScript : MonoBehaviour {
         gridSize = GameManager.Instance.gridSize;
         FixCamera();
         
-        int numberOfBlocks = GameObject.FindObjectsOfType<BlockScript>().Length;
+        int numberOfBlocks = GameObject.FindObjectOfType<LevelGeneratorScript>() ? 15 : GameObject.FindObjectsOfType<BlockScript>().Length;
 
         for (int n = 0; n < numberOfBlocks; n++)
         {

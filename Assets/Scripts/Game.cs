@@ -1,18 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
-public class LevelLoader : MonoBehaviour {
+public class Game : MonoBehaviour {
 
-    #region Singleton Pattern
-    private static LevelLoader instance = null;
-
-    public static LevelLoader Instance
-    {
-        get { return instance; }
-    }
-    #endregion
-
+    public int levelNumber;
     public int gridSize;
     public List<GameObject> activeBlocks = new List<GameObject>();
     public List<Vector2> filledListPos = new List<Vector2>();
