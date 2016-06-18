@@ -1,10 +1,9 @@
 ﻿using UnityEngine;
-using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 
-public class GameManager : MonoBehaviour {
-
+public class GameManager : MonoBehaviour
+{
     #region Singleton Pattern
     private static GameManager instance = null;
 
@@ -14,74 +13,78 @@ public class GameManager : MonoBehaviour {
     }
     #endregion
 
-    public GridScript gridS;
-    public SpawnScript spawnS;
-
+    public int level;
     public int gridSize;
-    public int blockSize;
     public int tilesLeft;
+    public bool gamePaused;
 
     public List<GameObject> activeBlocks = new List<GameObject>();
     public List<GameObject>[] allBlocks = new List<GameObject>[6];
 
-    public float rotationSpeed = 3;
-    public bool rotatingBlock;
-
-    #region Notifications
-    public void OnEnable()
-    {
-        this.AddObserver(BlockPlaced, BlockTile.BlockPlaced);
-        this.AddObserver(BlockRemoved, BlockTile.BlockRemoved);
-        this.AddObserver(RotateBlock, BlockTile.RotateBlock);
-    }
-
-    public void OnDisable()
-    {
-        this.RemoveObserver(BlockPlaced, BlockTile.BlockPlaced);
-        this.RemoveObserver(BlockRemoved, BlockTile.BlockRemoved);
-        this.RemoveObserver(RotateBlock, BlockTile.RotateBlock);
-    }
-
-    void BlockPlaced(object sender, object info)
-    {
-        GameObject block = info as GameObject;
-        tilesLeft -= block.GetComponent<BlockScript>().tileList.Count;
-        Debug.Log(block.name + " was placed");
-    }
-
-    void BlockRemoved(object sender, object info)
-    {
-        GameObject block = info as GameObject;
-        tilesLeft += block.GetComponent<BlockScript>().tileList.Count;
-        Debug.Log(block.name + " was removed");
-    }
-
-    void RotateBlock(object sender, object info)
-    {
-        GameObject block = info as GameObject;
-        StartCoroutine("Rotate", block);
-        Debug.Log(block.name + " was rotated");
-    }
-    #endregion
 
     void Awake()
     {
         instance = this;
-        getAllBlocks();
-
-        if (GameObject.FindObjectOfType<Game>())
+        if (!GameObject.FindObjectOfType<LevelGeneratorScript>())
         {
-            Game game = GameObject.FindObjectOfType<Game>();
-            gridS.filledListPos = game.filledListPos;
-            gridSize = game.gridSize;
+            level = PlayerSave.currentLevel;
+            gridSize = PlayerSave.currentGridSize;
+            tilesLeft = gridSize * gridSize;
+            Debug.LogWarning("Trying to load map " + gridSize + "x" + level);
         }
     }
 
-    void getAllBlocks()
+    void Start()
+    {
+        GetAllBlocks();
+        if (!GameObject.FindObjectOfType<LevelGeneratorScript>())
+            LoadLevel();
+    }
+
+    void LoadLevel()
+    {
+        SaveLoad.LoadMaps(gridSize);
+        Game currentGame;
+        switch (gridSize)
+        {
+            case 4: currentGame = SaveLoad.saved4maps[level]; break;
+            case 5: currentGame = SaveLoad.saved5maps[level]; break;
+            case 6: currentGame = SaveLoad.saved6maps[level]; break;
+            default: return;
+        }
+
+        gridSize = currentGame.gridSize;
+
+        //Get filled grid positions
+        for (int n = 0; n < currentGame.filledListPosX.Count; n++)
+        {
+            GridScript.Instance.filledListPos.Add(new Vector2(currentGame.filledListPosX[n], currentGame.filledListPosY[n]));
+            tilesLeft--;
+        }
+        GridScript.Instance.FillGrid();
+
+        //Get blocks and resolutions
+        foreach (SerializableBlock sBlock in currentGame.sBlockList)
+        {
+            GameObject blockGO = Instantiate(Resources.Load(string.Format("Prefabs/Block {0}/{1}", sBlock.tilesNumber, sBlock.blockName))) as GameObject;
+            blockGO.transform.SetParent(GameObject.Find("Blocks").transform);
+            BlockScript bScript = blockGO.GetComponent<BlockScript>();
+            bScript.solutionIndex = sBlock.solvedIndex;
+            bScript.solutionPos = new Vector2(sBlock.solvedPosX, sBlock.solvedPosY);
+
+            for (int r = 0; r < Random.Range(0, 4); r++)
+                blockGO.GetComponent<BlockScript>().RotateBlock();
+        }
+
+        SpawnScript.Instance.DeleteSpawns();
+        Debug.LogWarning("Map Loaded!");
+    }
+
+    void GetAllBlocks()
     {
         for (int a = 2; a < allBlocks.Length; a++)
             allBlocks[a] = new List<GameObject>();
-        
+
         for (int i = 2; i < 6; i++)
         {
             Object[] blockFormats = (Object[])Resources.LoadAll(string.Format("Prefabs/Block {0}", i));
@@ -90,21 +93,5 @@ public class GameManager : MonoBehaviour {
                 allBlocks[i].Add(block as GameObject);
             }
         }
-    }
-
-    IEnumerator Rotate(GameObject block)
-    {
-        rotatingBlock = true;
-        int bNumber = block.GetComponent<BlockScript>().bNumber;
-        Transform spawnLoc = SpawnScript.Instance.spawnLocations[bNumber].transform;
-        for (float i = 0; i < 90 / rotationSpeed; i++)
-        {
-            block.transform.RotateAround(spawnLoc.position + new Vector3(0.55f, 0.55f, 0), Vector3.forward, -rotationSpeed);
-            yield return null;
-        }
-        block.transform.position = spawnLoc.position - Vector3.forward;
-        block.transform.rotation = Quaternion.Euler(Vector3.zero);
-        block.GetComponent<BlockScript>().RotateBlock();
-        rotatingBlock = false;
     }
 }

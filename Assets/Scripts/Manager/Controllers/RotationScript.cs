@@ -5,13 +5,12 @@ public class RotationScript : MonoBehaviour
 {
     public int bNumber;
     public GameObject parentBlock;
-    public float rotationSpeed = 3;
 
     float clickTime;
     float holdTime = 0.5f;
     bool rotating;
 
-    public const string RotateBlock = "BlockTile.RotateBlock";
+    public const string RotateBlock = "RotationScript.RotateBlock";
 
     void Start()
     {
@@ -21,13 +20,13 @@ public class RotationScript : MonoBehaviour
 
     void OnMouseDown()
     {
-        if (!GridScript.Instance.paused)
+        if (!GameManager.Instance.gamePaused)
             clickTime = Time.time;
     }
 
     void OnMouseDrag()
     {
-        if (!GridScript.Instance.paused)
+        if (!GameManager.Instance.gamePaused)
         {
             if (Time.time - clickTime > holdTime)
             {

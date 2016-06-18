@@ -10,8 +10,6 @@ public class GridScript : MonoBehaviour {
     {
         get { return instance; }
     }
-
-    void Awake() { instance = this; }
     #endregion
 
     public GameObject[,] gridGO;
@@ -19,14 +17,13 @@ public class GridScript : MonoBehaviour {
     public Color filledColor;
     public Color[] blocksColor = new Color[10];
     public List<Vector2> filledListPos = new List<Vector2>();
-    public bool paused;
 
     int gridSize;
 
-    void Start()
+    void Awake()
     {
+        instance = this;
         CreateGrid();
-        GameManager.Instance.tilesLeft = (gridSize * gridSize) - filledListPos.Count;
     }
 
     void CreateGrid()

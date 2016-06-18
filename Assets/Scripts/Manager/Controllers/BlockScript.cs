@@ -19,8 +19,8 @@ public class BlockScript : MonoBehaviour
 
     public Color bColor;
 
-    public Vector2 resolutionPos;
-    public int resolutionIndex;
+    public Vector2 solutionPos;
+    public int solutionIndex;
 
 
     void Awake()
@@ -32,17 +32,6 @@ public class BlockScript : MonoBehaviour
 
         transform.position = SpawnScript.Instance.spawnLocations[bNumber].transform.position - Vector3.forward;
         SpawnScript.Instance.spawnLocations[bNumber].GetComponent<RotationScript>().parentBlock = gameObject;
-
-        if (tileList.Count == 0)
-        {
-            bMatrix = new int[3, 3];
-            CreateBlock();
-            GetBlockIDs();
-            CreateBlockSprite();
-        }
-
-        foreach (BlockTile bTile in tileList)
-            bTile.GetComponent<SpriteRenderer>().color = bColor;
 
         RespawnBlock();
     }

@@ -12,8 +12,8 @@ public class SpawnScript : MonoBehaviour {
     }
     #endregion
 
-    public int blockSize = 3;
     public int gridSize;
+    public int blockSize = 3;
 
     int spawnColumns;
     float spawnSpacingX;
@@ -31,9 +31,9 @@ public class SpawnScript : MonoBehaviour {
         gridSize = GameManager.Instance.gridSize;
         FixCamera();
         
-        int numberOfBlocks = GameObject.FindObjectOfType<LevelGeneratorScript>() ? 15 : GameObject.FindObjectsOfType<BlockScript>().Length;
+        int numberOfSpawns = 15;
 
-        for (int n = 0; n < numberOfBlocks; n++)
+        for (int n = 0; n < numberOfSpawns; n++)
         {
             GameObject spawn = Instantiate(Resources.Load("Prefabs/SpawnHolder"), Vector3.zero, Quaternion.identity) as GameObject;
             spawn.transform.SetParent(GameObject.Find("Spawn Locations").transform);
@@ -87,6 +87,14 @@ public class SpawnScript : MonoBehaviour {
                 spawnPos = new Vector3(4.6f, 6f);
                 blockScale = 0.5f;
                 break;
+        }
+    }
+
+    public void DeleteSpawns()
+    {
+        for (int n = GameManager.Instance.activeBlocks.Count; n < spawnLocations.Count; n++)
+        {
+            Destroy(spawnLocations[n]);
         }
     }
 }
