@@ -36,8 +36,7 @@ public class LevelGeneratorScript : MonoBehaviour
 
     public void Click1()
     {
-        Scene scene = SceneManager.GetActiveScene();
-        SceneManager.LoadScene(scene.name);
+        SaveLoad.ChangeMap(gridSize, level);
     }
 
     public void Click2()

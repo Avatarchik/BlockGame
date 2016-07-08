@@ -86,6 +86,8 @@ public class LogicManager : MonoBehaviour
     {
         BlockScript bs = blockGO.GetComponent<BlockScript>();
         Color color = GridScript.Instance.blocksColor[bs.bNumber];
+
+        blockGO.transform.localScale = Vector3.one;
         foreach (BlockTile bTile in bs.tileList)
         {
             Vector2 tilePos = destiny - (bs.rotPos[bs.rotIndex] - bTile.relativePos);
@@ -93,15 +95,14 @@ public class LogicManager : MonoBehaviour
             gTile.gType = GridType.Used;
             gTile.gridPos = tilePos;
             gTile.parentBlock = bs;
-            gTile.bNumber = gTile.parentBlock.bNumber;
-            gTile.GetComponent<SpriteRenderer>().color = color;
-            gTile.GetComponent<SpriteRenderer>().sortingLayerName = "block";
+            gTile.bNumber = bs.bNumber;
 
             bTile.transform.position = new Vector3(tilePos.x, tilePos.y, -1);
             bTile.GetComponent<SpriteRenderer>().sortingOrder = -1;
         }
         bs.bPlaced = true;
         bs.bPos = destiny;
+        
         this.PostNotification(BlockPlacedNotification, blockGO);
     }
 

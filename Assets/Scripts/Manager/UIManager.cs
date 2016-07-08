@@ -25,6 +25,7 @@ public class UIManager : MonoBehaviour {
 
         Vector2 blockSolution = bs.solutionPos;
         LogicManager.Instance.PlaceBlock(randomBlock, blockSolution);
+
     }
 
     public void TogglePauseMenu()

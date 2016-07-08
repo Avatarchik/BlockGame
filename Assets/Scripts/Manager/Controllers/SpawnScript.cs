@@ -42,11 +42,15 @@ public class SpawnScript : MonoBehaviour {
             Vector3 pos = new Vector3(-spawnSpacingX * (n % spawnColumns), ((n / spawnColumns) * spawnSpacingY), 0);
             spawn.transform.position = pos + spawnPos;
 
-            BoxCollider2D bc2d = spawn.GetComponent<BoxCollider2D>();          
-            bc2d.offset = new Vector2((blockScale / 2) * (blockSize - 1), (blockScale / 2) * (blockSize - 1));
-            bc2d.size = new Vector2(blockScale * blockSize, blockScale * blockSize);
+            Transform background = spawn.transform.Find("Spawn Background");
+            background.localScale = Vector3.one * blockScale * blockSize;
+            background.localPosition = Vector3.one * blockScale;
 
-            spawn.GetComponent<RotationScript>().bNumber = n;
+            Transform rotButton = spawn.transform.Find("Rotation Button");
+            rotButton.localScale = Vector3.one * blockScale * 0.8f;
+            rotButton.localPosition = new Vector3(2.5f * blockScale, -rotButton.localScale.x / 2, -2);
+            rotButton.GetComponent<RotationScript>().bNumber = n;
+
             spawnLocations.Add(spawn);
         }       
 	}

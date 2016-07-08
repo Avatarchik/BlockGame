@@ -77,13 +77,14 @@ public static class SaveLoad
     public static void ChangeMap(int gridSize, int level)
     {
         BinaryFormatter bf = new BinaryFormatter();
+        string mapsPath = System.IO.Path.Combine(Application.streamingAssetsPath, "saved" + gridSize + "maps.gd"); ;
         switch (gridSize)
         {
             case 4:
-                if (File.Exists(Application.persistentDataPath + "/saved4maps.gd"))//if the file exists deserialize
+                if (File.Exists(mapsPath))//if the file exists deserialize
                 {
                     BinaryFormatter bf2 = new BinaryFormatter();
-                    FileStream file2 = File.Open(Application.persistentDataPath + "/saved4maps.gd", FileMode.Open);
+                    FileStream file2 = File.Open(mapsPath, FileMode.Open);
                     saved4maps = (List<Game>)bf2.Deserialize(file2);
                     file2.Close();
                 }
@@ -91,16 +92,16 @@ public static class SaveLoad
                     saved4maps = new List<Game>();
 
                 SaveLoad.saved4maps[level] = new Game();
-                FileStream file4 = File.Create(Application.persistentDataPath + "/saved4maps.gd");
+                FileStream file4 = File.Create(mapsPath);
                 bf.Serialize(file4, SaveLoad.saved4maps);
                 file4.Close();
                 break;
 
             case 5:
-                if (File.Exists(Application.persistentDataPath + "/saved5maps.gd"))//if the file exists deserialize
+                if (File.Exists(mapsPath))//if the file exists deserialize
                 {
                     BinaryFormatter bf2 = new BinaryFormatter();
-                    FileStream file2 = File.Open(Application.persistentDataPath + "/saved5maps.gd", FileMode.Open);
+                    FileStream file2 = File.Open(mapsPath, FileMode.Open);
                     saved5maps = (List<Game>)bf2.Deserialize(file2);
                     file2.Close();
                 }
@@ -108,16 +109,16 @@ public static class SaveLoad
                     saved5maps = new List<Game>();
 
                 SaveLoad.saved5maps[level] = new Game();
-                FileStream file5 = File.Create(Application.persistentDataPath + "/saved5maps.gd");
+                FileStream file5 = File.Create(mapsPath);
                 bf.Serialize(file5, SaveLoad.saved5maps);
                 file5.Close();
                 break;
 
             case 6:
-                if (File.Exists(Application.persistentDataPath + "/saved6maps.gd"))//if the file exists deserialize
+                if (File.Exists(mapsPath))//if the file exists deserialize
                 {
                     BinaryFormatter bf2 = new BinaryFormatter();
-                    FileStream file2 = File.Open(Application.persistentDataPath + "/saved6maps.gd", FileMode.Open);
+                    FileStream file2 = File.Open(mapsPath, FileMode.Open);
                     saved6maps = (List<Game>)bf2.Deserialize(file2);
                     file2.Close();
                 }
@@ -125,7 +126,7 @@ public static class SaveLoad
                     saved6maps = new List<Game>();
 
                 SaveLoad.saved6maps[level] = new Game();
-                FileStream file6 = File.Create(Application.persistentDataPath + "/saved6maps.gd");
+                FileStream file6 = File.Create(mapsPath);
                 bf.Serialize(file6, SaveLoad.saved6maps);
                 file6.Close();
                 break;

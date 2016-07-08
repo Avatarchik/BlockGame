@@ -6,6 +6,11 @@ public class LevelSelectorScript : MonoBehaviour {
     public int gridSize;
     public int levelToLoad;
 
+    void Awake()
+    {
+        Screen.fullScreen = false;
+    }
+
     public void Click()
     {
         PlayerSave.currentGridSize = gridSize;

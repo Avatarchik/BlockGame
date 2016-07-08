@@ -10,10 +10,6 @@ public class BlockTile : Tile
     Vector3 originalPos;
     GameObject[,] gridGO { get { return GridScript.Instance.gridGO; } set { GridScript.Instance.gridGO = value; } }
 
-    float clickTime;
-    float holdTime = 0.5f;
-    bool blockMoved;
-
     public const string RotateBlock = "RotationScript.RotateBlock";
 
     void OnMouseDown()
@@ -22,8 +18,6 @@ public class BlockTile : Tile
         {
             offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
             originalPos = gameObject.transform.position;
-            clickTime = Time.time;
-            blockMoved = parentBlock.bPlaced? true : false;
             LogicManager.Instance.RemoveBlockGrid(parentBlock.bNumber);
         }
     }
@@ -35,30 +29,18 @@ public class BlockTile : Tile
             Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
             Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
 
-            if (((curPosition - originalPos).sqrMagnitude <= 0.1f) && !parentBlock.bPlaced && !blockMoved)
-            {
-                if ((Time.time - clickTime > holdTime))
-                {
-                    this.PostNotification(RotateBlock, parentBlock.gameObject);
-                    clickTime = Time.time;
-                }
-            }
-            else
-            {
-                blockMoved = true;
-                parentBlock.transform.localScale = Vector3.one;
-                
-                ClearGridColor();
+            parentBlock.transform.localScale = Vector3.one;
+            ClearGridColor();
 
-                //Traz o bloco para frente na camera
-                Vector3 blockPosition = new Vector3(curPosition.x - (transform.localPosition.x * parentBlock.transform.localScale.x), curPosition.y - (transform.localPosition.y * parentBlock.transform.localScale.x), -1f);
-                parentBlock.transform.position = blockPosition;
+            //Traz o bloco para frente na camera
+            Vector3 blockPosition = new Vector3(curPosition.x - (transform.localPosition.x * parentBlock.transform.localScale.x), curPosition.y - (transform.localPosition.y * parentBlock.transform.localScale.x), -1f);
+            parentBlock.transform.position = blockPosition;
 
-                foreach (BlockTile bTile in this.parentBlock.tileList)
-                    bTile.GetComponent<SpriteRenderer>().sortingOrder = 0;
+            foreach (BlockTile bTile in this.parentBlock.tileList)
+                bTile.GetComponent<SpriteRenderer>().sortingOrder = 2;
 
-                PaintGridPreview();
-            }
+            PaintGridPreview();
+
         }
     }
 
@@ -72,7 +54,7 @@ public class BlockTile : Tile
             if (LogicManager.Instance.CheckPosition(parentBlock.gameObject, destiny))
             {
                 LogicManager.Instance.PlaceBlock(parentBlock.gameObject, destiny);
-            }     
+            }
             else
             {
                 LogicManager.Instance.RemoveBlockGrid(parentBlock.bNumber);
@@ -83,6 +65,8 @@ public class BlockTile : Tile
             }
         }
         ClearGridColor();
+        foreach (BlockTile bTile in this.parentBlock.tileList)
+            bTile.GetComponent<SpriteRenderer>().sortingOrder = 0;
     }
 
 
@@ -96,13 +80,7 @@ public class BlockTile : Tile
                 gridGO[x, y].GetComponent<SpriteRenderer>().color = Color.grey;
             }
         }
-
-        foreach (Vector2 filledPos in GridScript.Instance.filledListPos)
-        {
-            int x = (int)filledPos.x;
-            int y = (int)filledPos.y;
-            gridGO[x, y].GetComponent<SpriteRenderer>().color = GridScript.Instance.filledColor;
-        }
+        GridScript.Instance.FillGrid();
     }
 
     void PaintGridPreview()
