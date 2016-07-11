@@ -15,7 +15,6 @@ public class GameManager : MonoBehaviour
 
     public int level;
     public int gridSize;
-    public int tilesLeft;
     public bool gamePaused;
 
     public List<GameObject> activeBlocks = new List<GameObject>();
@@ -29,7 +28,6 @@ public class GameManager : MonoBehaviour
         {
             level = PlayerSave.currentLevel;
             gridSize = PlayerSave.currentGridSize;
-            tilesLeft = gridSize * gridSize;
             Debug.LogWarning("Trying to load map " + gridSize + "x" + level);
         }
     }
@@ -37,6 +35,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         GetAllBlocks();
+        LogicManager.Instance.tilesLeft = gridSize * gridSize;
         if (!GameObject.FindObjectOfType<LevelGeneratorScript>())
             LoadLevel();
     }
@@ -59,7 +58,7 @@ public class GameManager : MonoBehaviour
         for (int n = 0; n < currentGame.filledListPosX.Count; n++)
         {
             GridScript.Instance.filledListPos.Add(new Vector2(currentGame.filledListPosX[n], currentGame.filledListPosY[n]));
-            tilesLeft--;
+            LogicManager.Instance.tilesLeft--;
         }
         GridScript.Instance.FillGrid();
 

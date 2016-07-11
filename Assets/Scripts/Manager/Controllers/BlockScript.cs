@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 public class BlockScript : MonoBehaviour
 {
-    [SerializeField]
-    int[] bLocations;
-    public int[,] bMatrix;
+    //[SerializeField]
+    //int[] bLocations;
+    //public int[,] bMatrix;
 
     public List<BlockTile> tileList = new List<BlockTile>();
     public int bNumber;
@@ -21,7 +21,7 @@ public class BlockScript : MonoBehaviour
 
     public Vector2 solutionPos;
     public int solutionIndex;
-
+    public bool bTip;
 
     void Awake()
     {
@@ -95,6 +95,7 @@ public class BlockScript : MonoBehaviour
         foreach (BlockTile bTile in tileList)
         {
             bTile.transform.localScale = new Vector3(0.9f, 0.9f, 0);
+            bTile.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/stoneBlock");
         }
     }
 

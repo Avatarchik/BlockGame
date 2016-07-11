@@ -7,7 +7,6 @@ public class BlockTile : Tile
 
     Vector3 screenPoint;
     Vector3 offset;
-    Vector3 originalPos;
     GameObject[,] gridGO { get { return GridScript.Instance.gridGO; } set { GridScript.Instance.gridGO = value; } }
 
     public const string RotateBlock = "RotationScript.RotateBlock";
@@ -17,8 +16,10 @@ public class BlockTile : Tile
         if (!GameManager.Instance.gamePaused)
         {
             offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
-            originalPos = gameObject.transform.position;
             LogicManager.Instance.RemoveBlockGrid(parentBlock.bNumber);
+
+            foreach (BlockTile bTile in this.parentBlock.tileList)
+                bTile.GetComponent<SpriteRenderer>().sortingOrder = 2;
         }
     }
 
@@ -29,18 +30,14 @@ public class BlockTile : Tile
             Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
             Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
 
-            parentBlock.transform.localScale = Vector3.one;
+            parentBlock.transform.localScale = Vector3.one * 0.9f;
             ClearGridColor();
 
             //Traz o bloco para frente na camera
             Vector3 blockPosition = new Vector3(curPosition.x - (transform.localPosition.x * parentBlock.transform.localScale.x), curPosition.y - (transform.localPosition.y * parentBlock.transform.localScale.x), -1f);
             parentBlock.transform.position = blockPosition;
 
-            foreach (BlockTile bTile in this.parentBlock.tileList)
-                bTile.GetComponent<SpriteRenderer>().sortingOrder = 2;
-
             PaintGridPreview();
-
         }
     }
 
@@ -52,9 +49,8 @@ public class BlockTile : Tile
             Vector2 destiny = closestGridLoc - (relativePos - parentBlock.rotPos[parentBlock.rotIndex]);
 
             if (LogicManager.Instance.CheckPosition(parentBlock.gameObject, destiny))
-            {
                 LogicManager.Instance.PlaceBlock(parentBlock.gameObject, destiny);
-            }
+
             else
             {
                 LogicManager.Instance.RemoveBlockGrid(parentBlock.bNumber);
@@ -96,13 +92,14 @@ public class BlockTile : Tile
             if (tilePos.x >= 0 && tilePos.x < SpawnScript.Instance.gridSize && tilePos.y >= 0 && tilePos.y < SpawnScript.Instance.gridSize)
             {
                 if (LogicManager.Instance.CheckPosition(parentBlock.gameObject, destiny))
-                    gridPreviewColor = Color.green;
+                    gridPreviewColor = new Color(0, 1, 0, 0.7f);
                 else
-                    gridPreviewColor = Color.red;
+                    gridPreviewColor = new Color(1, 0, 0, 0.7f);
 
                 gridGO[Mathf.RoundToInt(tilePos.x), Mathf.RoundToInt(tilePos.y)].GetComponent<SpriteRenderer>().color = gridPreviewColor;
             }
         }
+        GridScript.Instance.FillGrid();
     }
     #endregion
 }

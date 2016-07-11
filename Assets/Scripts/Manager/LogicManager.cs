@@ -3,7 +3,6 @@ using System.Collections;
 
 public class LogicManager : MonoBehaviour
 {
-
     #region Singleton Pattern
     private static LogicManager instance = null;
 
@@ -14,6 +13,8 @@ public class LogicManager : MonoBehaviour
 
     void Awake() { instance = this; }
     #endregion
+
+    public int tilesLeft;
 
     public int rotatingSpeed;
     public bool rotatingBlock;
@@ -39,14 +40,17 @@ public class LogicManager : MonoBehaviour
     void BlockPlaced(object sender, object info)
     {
         GameObject block = info as GameObject;
-        GameManager.Instance.tilesLeft -= block.GetComponent<BlockScript>().tileList.Count;
         Debug.Log(block.name + " was placed on " + block.GetComponent<BlockScript>().bPos);
+        tilesLeft -= block.GetComponent<BlockScript>().tileList.Count;
+
+        if (tilesLeft == 0)
+            LevelCompleted();      
     }
 
     void BlockRemoved(object sender, object info)
     {
         GameObject block = info as GameObject;
-        GameManager.Instance.tilesLeft += block.GetComponent<BlockScript>().tileList.Count;
+        tilesLeft += block.GetComponent<BlockScript>().tileList.Count;
         Debug.Log(block.name + " was removed");
     }
 
@@ -85,7 +89,6 @@ public class LogicManager : MonoBehaviour
     public void PlaceBlock(GameObject blockGO, Vector2 destiny)
     {
         BlockScript bs = blockGO.GetComponent<BlockScript>();
-        Color color = GridScript.Instance.blocksColor[bs.bNumber];
 
         blockGO.transform.localScale = Vector3.one;
         foreach (BlockTile bTile in bs.tileList)
@@ -142,5 +145,20 @@ public class LogicManager : MonoBehaviour
         block.transform.rotation = Quaternion.Euler(Vector3.zero);
         block.GetComponent<BlockScript>().RotateBlock();
         rotatingBlock = false;
+    }
+
+    void LevelCompleted()
+    {
+        switch (GameManager.Instance.gridSize)
+        {
+            case 4: PlayerSave.completedLevels4[GameManager.Instance.level] = true; break;
+            case 5: PlayerSave.completedLevels4[GameManager.Instance.level] = true; break;
+            case 6: PlayerSave.completedLevels4[GameManager.Instance.level] = true; break;
+        }
+        Debug.LogWarning("Level " + GameManager.Instance.gridSize + "x" + GameManager.Instance.level + " completed!");
+
+        Time.timeScale = 0f;
+        UIManager.Instance.levelCompletedCanvas.SetActive(true);
+        GameManager.Instance.gamePaused = true;
     }
 }
