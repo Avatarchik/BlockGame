@@ -149,16 +149,9 @@ public class LogicManager : MonoBehaviour
 
     void LevelCompleted()
     {
-        switch (GameManager.Instance.gridSize)
-        {
-            case 4: PlayerSave.completedLevels4[GameManager.Instance.level] = true; break;
-            case 5: PlayerSave.completedLevels4[GameManager.Instance.level] = true; break;
-            case 6: PlayerSave.completedLevels4[GameManager.Instance.level] = true; break;
-        }
-        Debug.LogWarning("Level " + GameManager.Instance.gridSize + "x" + GameManager.Instance.level + " completed!");
-
         Time.timeScale = 0f;
-        UIManager.Instance.levelCompletedCanvas.SetActive(true);
         GameManager.Instance.gamePaused = true;
+        SaveLoad.SaveProgress();        
+        UIManager.Instance.levelCompletedCanvas.SetActive(true);       
     }
 }

@@ -6,151 +6,83 @@ using System.IO;
 
 public static class SaveLoad
 {
-    //C:/Users/lucap/AppData/LocalLow/DefaultCompany/TesteBloco
+    public static List<Game>[] savedMaps;
+    public static bool[,] mapsCompleted;
 
-    public static List<Game> saved4maps;
-    public static List<Game> saved5maps;
-    public static List<Game> saved6maps;
-
-    public static void SaveMap(int gridSize)
+    #region Maps
+    public static void SaveMap()
     {
-        BinaryFormatter bf = new BinaryFormatter();
-        string mapsPath = System.IO.Path.Combine(Application.streamingAssetsPath, "saved" + gridSize + "maps.gd"); ;
-        switch (gridSize)
+        string mapsPath = Path.Combine(Application.streamingAssetsPath, "savedMaps.gd");
+
+        if (File.Exists(mapsPath))                          //if the file exists deserialize
         {
-            case 4:
-                if (File.Exists(mapsPath))//if the file exists deserialize
-                {
-                    BinaryFormatter bf2 = new BinaryFormatter();
-                    FileStream file2 = File.Open(mapsPath, FileMode.Open);
-                    saved4maps = (List<Game>)bf2.Deserialize(file2);
-                    file2.Close();
-                }
-                else                                                //else make a new list to store the maps
-                    saved4maps = new List<Game>();
-                
-                SaveLoad.saved4maps.Add(new Game());
-                FileStream file4 = File.Create(mapsPath);
-                bf.Serialize(file4, SaveLoad.saved4maps);
-                file4.Close();
-                Debug.Log("Novo total de mapas de tamanho " + gridSize + ": " + saved4maps.Count);
-                break;
-
-            case 5:
-                if (File.Exists(mapsPath))//if the file exists deserialize
-                {
-                    BinaryFormatter bf2 = new BinaryFormatter();
-                    FileStream file2 = File.Open(mapsPath, FileMode.Open);
-                    saved4maps = (List<Game>)bf2.Deserialize(file2);
-                    file2.Close();
-                }
-                else                                                //else make a new list to store the maps
-                    saved5maps = new List<Game>();
-
-                SaveLoad.saved5maps.Add(new Game());
-                FileStream file5 = File.Create(mapsPath);
-                bf.Serialize(file5, SaveLoad.saved4maps);
-                file5.Close();
-                Debug.Log("Novo total de mapas de tamanho " + gridSize + ": " + saved5maps.Count);
-                break;
-
-            case 6:
-                if (File.Exists(mapsPath))//if the file exists deserialize
-                {
-                    BinaryFormatter bf2 = new BinaryFormatter();
-                    FileStream file2 = File.Open(mapsPath, FileMode.Open);
-                    saved4maps = (List<Game>)bf2.Deserialize(file2);
-                    file2.Close();
-                }
-                else                                                //else make a new list to store the maps
-                    saved6maps = new List<Game>();
-
-                SaveLoad.saved6maps.Add(new Game());
-                FileStream file6 = File.Create(mapsPath);
-                bf.Serialize(file6, SaveLoad.saved4maps);
-                file6.Close();
-                Debug.Log("Novo total de mapas de tamanho " + gridSize + ": " + saved6maps.Count);
-                break;
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(mapsPath, FileMode.Open);
+            savedMaps = (List<Game>[])bf.Deserialize(file);
+            file.Close();
         }
+        else
+        {
+            savedMaps = new List<Game>[10];
+            for (int i = 0; i < 10; i++)
+                savedMaps[i] = new List<Game>();
+        }
+
+        Game currentGame = new Game();
+        int gridSize = currentGame.gridSize;
+        savedMaps[gridSize].Add(currentGame);
+
+        BinaryFormatter bf2 = new BinaryFormatter();
+        FileStream file2 = File.Create(mapsPath);
+        bf2.Serialize(file2, savedMaps);
+        file2.Close();
+        Debug.LogWarning("Total de mapas de tamanho " + gridSize + ": " + savedMaps[gridSize].Count);       
     }
 
-    public static void ChangeMap(int gridSize, int level)
+    public static void ChangeMap(int level)
     {
         BinaryFormatter bf = new BinaryFormatter();
-        string mapsPath = System.IO.Path.Combine(Application.streamingAssetsPath, "saved" + gridSize + "maps.gd"); ;
-        switch (gridSize)
+        string mapsPath = Path.Combine(Application.streamingAssetsPath, "savedMaps.gd"); ;
+        if (File.Exists(mapsPath))//if the file exists deserialize
         {
-            case 4:
-                if (File.Exists(mapsPath))//if the file exists deserialize
-                {
-                    BinaryFormatter bf2 = new BinaryFormatter();
-                    FileStream file2 = File.Open(mapsPath, FileMode.Open);
-                    saved4maps = (List<Game>)bf2.Deserialize(file2);
-                    file2.Close();
-                }
-                else                                                //else make a new list to store the maps
-                    saved4maps = new List<Game>();
-
-                SaveLoad.saved4maps[level] = new Game();
-                FileStream file4 = File.Create(mapsPath);
-                bf.Serialize(file4, SaveLoad.saved4maps);
-                file4.Close();
-                break;
-
-            case 5:
-                if (File.Exists(mapsPath))//if the file exists deserialize
-                {
-                    BinaryFormatter bf2 = new BinaryFormatter();
-                    FileStream file2 = File.Open(mapsPath, FileMode.Open);
-                    saved5maps = (List<Game>)bf2.Deserialize(file2);
-                    file2.Close();
-                }
-                else                                                //else make a new list to store the maps
-                    saved5maps = new List<Game>();
-
-                SaveLoad.saved5maps[level] = new Game();
-                FileStream file5 = File.Create(mapsPath);
-                bf.Serialize(file5, SaveLoad.saved5maps);
-                file5.Close();
-                break;
-
-            case 6:
-                if (File.Exists(mapsPath))//if the file exists deserialize
-                {
-                    BinaryFormatter bf2 = new BinaryFormatter();
-                    FileStream file2 = File.Open(mapsPath, FileMode.Open);
-                    saved6maps = (List<Game>)bf2.Deserialize(file2);
-                    file2.Close();
-                }
-                else                                                //else make a new list to store the maps
-                    saved6maps = new List<Game>();
-
-                SaveLoad.saved6maps[level] = new Game();
-                FileStream file6 = File.Create(mapsPath);
-                bf.Serialize(file6, SaveLoad.saved6maps);
-                file6.Close();
-                break;
+            BinaryFormatter bf2 = new BinaryFormatter();
+            FileStream file2 = File.Open(mapsPath, FileMode.Open);
+            savedMaps = (List<Game>[])bf2.Deserialize(file2);
+            file2.Close();
         }
-        Debug.Log("Mapa " + gridSize + "x" + level + " foi alterado!");
+        else
+        {
+            Debug.LogWarning("Não existe o save!");
+            return;
+        }
+
+        Game currentGame = new Game();
+        int gridSize = currentGame.gridSize;
+        savedMaps[gridSize][level] = currentGame;
+
+        FileStream file = File.Create(mapsPath);
+        bf.Serialize(file, savedMaps);
+        file.Close();
+
+        Debug.LogWarning("Mapa " + gridSize + "x" + level + " foi alterado!");
     }
 
-    public static void LoadMaps(int gridSize)
+    public static void LoadMaps()
     {
         // Put your file to "YOUR_UNITY_PROJ/Assets/StreamingAssets"
         // example: "YOUR_UNITY_PROJ/Assets/StreamingAssets/db.bytes"
 
         string mapsPath = "";
-
         if (Application.platform == RuntimePlatform.Android)
         {
             // Android
-            string oriPath = System.IO.Path.Combine(Application.streamingAssetsPath, "saved" + gridSize + "maps.gd");
+            string oriPath = System.IO.Path.Combine(Application.streamingAssetsPath, "savedMaps.gd");
 
             // Android only use WWW to read file
             WWW reader = new WWW(oriPath);
             while (!reader.isDone) { }
 
-            string realPath = Application.persistentDataPath + "/saved" + gridSize + "maps.gd";
+            string realPath = Application.persistentDataPath + "/savedMaps.gd";
             System.IO.File.WriteAllBytes(realPath, reader.bytes);
 
             mapsPath = realPath;
@@ -158,7 +90,7 @@ public static class SaveLoad
         else
         {
             // iOS
-            mapsPath = System.IO.Path.Combine(Application.streamingAssetsPath, "saved" + gridSize + "maps.gd");
+            mapsPath = System.IO.Path.Combine(Application.streamingAssetsPath, "savedMaps.gd");
         }
 
 
@@ -166,16 +98,81 @@ public static class SaveLoad
         {
             BinaryFormatter bf = new BinaryFormatter();
             FileStream file = File.Open(mapsPath, FileMode.Open);
-            switch (gridSize)
-            {
-                case 4: SaveLoad.saved4maps = (List<Game>)bf.Deserialize(file); break;
-                case 5: SaveLoad.saved5maps = (List<Game>)bf.Deserialize(file); break;
-                case 6: SaveLoad.saved6maps = (List<Game>)bf.Deserialize(file); break;
-            }
-            
+            savedMaps = (List<Game>[])bf.Deserialize(file);
             file.Close();
         }
         else
-            Debug.Log("File not found");
+            Debug.LogWarning("File não encontrado");
     }
+    #endregion
+
+    #region Player Progression
+    public static void SaveProgress()
+    {
+        string mapsCompletedPath = Path.Combine(Application.streamingAssetsPath, "mapsCompleted.gd");
+
+        //Open file
+        if (File.Exists(mapsCompletedPath))                         
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(mapsCompletedPath, FileMode.Open);
+            mapsCompleted = (bool[,])bf.Deserialize(file);
+            file.Close();
+        }
+        else
+            mapsCompleted = new bool[10, 100];
+  
+        int gridSize = GameManager.Instance.gridSize;
+        int level = GameManager.Instance.level;
+        mapsCompleted[gridSize, level] = true;
+
+        BinaryFormatter bf2 = new BinaryFormatter();
+        FileStream file2 = File.Create(mapsCompletedPath);
+        bf2.Serialize(file2, mapsCompleted);
+        file2.Close();
+        Debug.LogWarning("Progresso no mapa " + gridSize + "x" + level + " foi salvo!");
+    }
+
+    public static void LoadProgress()
+    {
+        string mapsCompletedPath = "";
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            // Android
+            string oriPath = System.IO.Path.Combine(Application.streamingAssetsPath, "mapsCompleted.gd");
+
+            // Android only use WWW to read file
+            WWW reader = new WWW(oriPath);
+            while (!reader.isDone) { }
+
+            string realPath = Application.persistentDataPath + "/mapsCompleted.gd";
+            System.IO.File.WriteAllBytes(realPath, reader.bytes);
+
+            mapsCompletedPath = realPath;
+        }
+        else
+        {
+            // iOS
+            mapsCompletedPath = System.IO.Path.Combine(Application.streamingAssetsPath, "mapsCompleted.gd");
+        }
+
+
+        if (File.Exists(mapsCompletedPath))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(mapsCompletedPath, FileMode.Open);
+            mapsCompleted = (bool[,])bf.Deserialize(file);
+            file.Close();
+        }
+        else
+        {
+            mapsCompleted = new bool[10, 100];
+            BinaryFormatter bf2 = new BinaryFormatter();
+            FileStream file2 = File.Create(mapsCompletedPath);
+            bf2.Serialize(file2, mapsCompleted);
+            file2.Close();
+            Debug.LogWarning("Save criado!");
+        }    
+    }
+    #endregion
 }

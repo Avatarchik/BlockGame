@@ -7,8 +7,8 @@ public class Game {
 
     public static Game current;
     public int levelNumber;
-
     public int gridSize;
+
     public List<int> filledListPosX = new List<int>();
     public List<int> filledListPosY = new List<int>();
 

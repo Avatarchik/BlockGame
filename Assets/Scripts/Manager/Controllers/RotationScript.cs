@@ -10,7 +10,8 @@ public class RotationScript : MonoBehaviour
 
     void Start()
     {
-        parentBlock = GameManager.Instance.activeBlocks[bNumber];
+        if (!GameObject.FindObjectOfType<LevelGeneratorScript>())
+            parentBlock = GameManager.Instance.activeBlocks[bNumber];
     }
 
     void OnMouseDown()

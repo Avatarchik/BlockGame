@@ -42,16 +42,8 @@ public class GameManager : MonoBehaviour
 
     void LoadLevel()
     {
-        SaveLoad.LoadMaps(gridSize);
-        Game currentGame;
-        switch (gridSize)
-        {
-            case 4: currentGame = SaveLoad.saved4maps[level]; break;
-            case 5: currentGame = SaveLoad.saved5maps[level]; break;
-            case 6: currentGame = SaveLoad.saved6maps[level]; break;
-            default: return;
-        }
-
+        SaveLoad.LoadMaps();
+        Game currentGame = SaveLoad.savedMaps[gridSize][level];
         gridSize = currentGame.gridSize;
 
         //Get filled grid positions

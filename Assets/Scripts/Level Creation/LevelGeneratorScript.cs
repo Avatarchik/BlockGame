@@ -36,12 +36,12 @@ public class LevelGeneratorScript : MonoBehaviour
 
     public void Click1()
     {
-        SaveLoad.ChangeMap(gridSize, level);
+        SaveLoad.ChangeMap(level);
     }
 
     public void Click2()
     {
-        SaveLoad.SaveMap(gridSize);
+        SaveLoad.SaveMap();
     }      
 
     #region Private
