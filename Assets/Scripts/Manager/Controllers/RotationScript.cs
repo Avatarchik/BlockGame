@@ -3,20 +3,20 @@ using System.Collections;
 
 public class RotationScript : MonoBehaviour
 {
-    public int bNumber;
-    public GameObject parentBlock;
+    public int spawnNumber;
+    public GameObject block;
 
     public const string RotateBlock = "RotationScript.RotateBlock";
 
     void Start()
     {
         if (!GameObject.FindObjectOfType<LevelGeneratorScript>())
-            parentBlock = GameManager.Instance.activeBlocks[bNumber];
+            block = LogicManager.Instance.unplacedBlocks[spawnNumber];
     }
 
     void OnMouseDown()
     {
-        if (!GameManager.Instance.gamePaused && !LogicManager.Instance.rotatingBlock && !parentBlock.GetComponent<BlockScript>().bPlaced)
-            this.PostNotification(RotateBlock, parentBlock);
+        if (block && !LogicManager.Instance.rotatingBlock && !block.GetComponent<BlockScript>().bPlaced)
+            this.PostNotification(RotateBlock, gameObject.GetComponentInParent<Transform>().gameObject);
     }
 }

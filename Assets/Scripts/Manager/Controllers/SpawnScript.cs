@@ -49,7 +49,7 @@ public class SpawnScript : MonoBehaviour {
             Transform rotButton = spawn.transform.Find("Rotation Button");
             rotButton.localScale = Vector3.one * blockScale * 0.8f;
             rotButton.localPosition = new Vector3(2.5f * blockScale, -rotButton.localScale.x / 2, -2);
-            rotButton.GetComponent<RotationScript>().bNumber = n;
+            rotButton.GetComponent<RotationScript>().spawnNumber = n;
 
             spawnLocations.Add(spawn);
         }       

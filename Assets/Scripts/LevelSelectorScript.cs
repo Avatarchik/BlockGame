@@ -11,7 +11,6 @@ public class LevelSelectorScript : MonoBehaviour
 
     void Awake()
     {
-        Screen.fullScreen = false;
         SaveLoad.LoadProgress();
         if (SaveLoad.mapsCompleted[gridSize, levelToLoad] == true)
         {

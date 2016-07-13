@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -37,7 +38,12 @@ public class GameManager : MonoBehaviour
         GetAllBlocks();
         LogicManager.Instance.tilesLeft = gridSize * gridSize;
         if (!GameObject.FindObjectOfType<LevelGeneratorScript>())
+        {
             LoadLevel();
+            LogicManager.Instance.totalTiles = gridSize * gridSize - GridScript.Instance.filledListPos.Count;
+            LogicManager.Instance.unplacedBlocks = activeBlocks;
+            GameObject.Find("Tiles Text").GetComponent<Text>().text = LogicManager.Instance.tilesLeft + "/" + LogicManager.Instance.totalTiles;
+        }
     }
 
     void LoadLevel()

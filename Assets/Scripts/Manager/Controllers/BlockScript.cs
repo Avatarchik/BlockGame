@@ -10,6 +10,7 @@ public class BlockScript : MonoBehaviour
 
     public List<BlockTile> tileList = new List<BlockTile>();
     public int bNumber;
+    public int spawnNumber;
     public bool bPlaced;
     public Vector2 bPos;
 
@@ -26,12 +27,13 @@ public class BlockScript : MonoBehaviour
     void Awake()
     {
         bNumber = GameManager.Instance.activeBlocks.Count;
+        spawnNumber = bNumber;
         GameManager.Instance.activeBlocks.Add(gameObject);
 
         bColor = GridScript.Instance.blocksColor[bNumber];
 
         transform.position = SpawnScript.Instance.spawnLocations[bNumber].transform.position - Vector3.forward;
-        SpawnScript.Instance.spawnLocations[bNumber].GetComponentInChildren<RotationScript>().parentBlock = gameObject;
+        SpawnScript.Instance.spawnLocations[bNumber].GetComponentInChildren<RotationScript>().block = gameObject;
 
         RespawnBlock();
     }
