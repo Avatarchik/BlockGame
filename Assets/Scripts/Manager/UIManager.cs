@@ -20,6 +20,8 @@ public class UIManager : MonoBehaviour {
     public GameObject pauseMenuCanvas;
     public GameObject levelCompletedCanvas;
 
+    public static string PauseNotification = "UIManager.Pause";
+
     public void GiveTip()
     {
         List<GameObject> notPlacedBlocks = new List<GameObject>();
@@ -68,6 +70,7 @@ public class UIManager : MonoBehaviour {
             Time.timeScale = 0f;
             pauseMenuCanvas.SetActive(true);
             GameManager.Instance.gamePaused = true;
+            this.PostNotification(PauseNotification);
         }
 
         else
@@ -75,6 +78,7 @@ public class UIManager : MonoBehaviour {
             Time.timeScale = 1f;
             pauseMenuCanvas.SetActive(false);
             GameManager.Instance.gamePaused = false;
+            this.PostNotification(PauseNotification);
         }
     }
 
@@ -96,6 +100,21 @@ public class UIManager : MonoBehaviour {
     public void LoadNextLevel()
     {
         PlayerSave.currentLevel = GameManager.Instance.level + 1;
+        SaveLoad.LoadMaps();
+        try
+        {
+            Game currentGame = SaveLoad.savedMaps[PlayerSave.currentGridSize][PlayerSave.currentLevel];
+        }
+        catch
+        {
+            Debug.LogWarning("Não foi possível carregar o mapa " + PlayerSave.currentGridSize + "x" + PlayerSave.currentLevel);
+            return;
+        }
         SceneManager.LoadScene("Base Map", LoadSceneMode.Single);
+    }
+
+    public void DeleteSave()
+    {
+        SaveLoad.ResetProgress();
     }
 }

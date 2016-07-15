@@ -8,58 +8,48 @@ public class BlockTile : Tile
     Vector3 offset;
     GameObject[,] gridGO { get { return GridScript.Instance.gridGO; } set { GridScript.Instance.gridGO = value; } }
 
+    #region Mouse
     void OnMouseDown()
     {
-        if (!GameManager.Instance.gamePaused)
-        {
-            offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
-            parentBlock.transform.localScale = Vector3.one * 0.9f;
-            foreach (BlockTile bTile in this.parentBlock.tileList)
-                bTile.GetComponent<SpriteRenderer>().sortingOrder = 2;
+        offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
+        parentBlock.transform.localScale = Vector3.one * 0.9f;
+        foreach (BlockTile bTile in parentBlock.tileList)
+            bTile.GetComponent<SpriteRenderer>().sortingOrder = 2;
 
-            if (parentBlock.bPlaced)
-                this.PostNotification(LogicManager.BlockRemovedNotification, parentBlock.gameObject);
+        RemoveBlockGrid(parentBlock.gameObject);
+        LogicManager.Instance.RearrangeBlocks(parentBlock.gameObject);
 
-            RemoveBlockGrid(parentBlock.gameObject);
-            LogicManager.Instance.RearrangeBlocks(parentBlock.gameObject);
-        }
+        if (parentBlock.bPlaced)
+            this.PostNotification(LogicManager.BlockRemovedNotification, parentBlock.gameObject);
     }
 
     void OnMouseDrag()
     {
-        if (!GameManager.Instance.gamePaused && !LogicManager.Instance.rotatingBlock)
-        {
-            Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
-            Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
+        Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
+        Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
 
-            //Traz o bloco para frente na camera
-            float blockScale = parentBlock.transform.localScale.x;
-            parentBlock.transform.position = new Vector3(curPosition.x - (transform.localPosition.x * blockScale), curPosition.y - (transform.localPosition.y * blockScale), -1f);
+        //Traz o bloco para frente na camera
+        float blockScale = parentBlock.transform.localScale.x;
+        parentBlock.transform.position = new Vector3(curPosition.x - (transform.localPosition.x * blockScale), curPosition.y - (transform.localPosition.y * blockScale), -1f);
 
-            PaintGridPreview();
-        }
+        PaintGridPreview();
     }
 
     void OnMouseUp()
     {
-        if (!GameManager.Instance.gamePaused && !LogicManager.Instance.rotatingBlock)
-        {
-            Vector2 closestGridLoc = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
-            Vector2 destiny = closestGridLoc - (relativePos - parentBlock.rotPos[parentBlock.rotIndex]);
+        Vector2 closestGridLoc = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
+        Vector2 destiny = closestGridLoc - (relativePos - parentBlock.rotPos[parentBlock.rotIndex]);
 
-            if (LogicManager.Instance.CheckPosition(parentBlock.gameObject, destiny))
-                LogicManager.Instance.PlaceBlock(parentBlock.gameObject, destiny);
+        if (LogicManager.Instance.CheckPosition(parentBlock.gameObject, destiny))
+            LogicManager.Instance.PlaceBlock(parentBlock.gameObject, destiny);
+        else
+            LogicManager.Instance.RespawnBlock(parentBlock.gameObject);
 
-            else
-            {
-                LogicManager.Instance.RespawnBlock(parentBlock.gameObject);
-            }
-        }
         ClearGridColor();
         foreach (BlockTile bTile in parentBlock.tileList)
             bTile.GetComponent<SpriteRenderer>().sortingOrder = 0;
     }
-
+    #endregion
 
     #region Private
     void ClearGridColor()
@@ -114,7 +104,6 @@ public class BlockTile : Tile
                 }
             }
         }
-        bs.bPlaced = false;
     }
     #endregion
 }

@@ -31,7 +31,7 @@ public class LevelGeneratorScript : MonoBehaviour
                     CompleteGrid(i, j);
 
         FillEmptyGrid();
-        SpawnScript.Instance.DeleteSpawns();
+        SpawnScript.Instance.DeleteExtraSpawns();
     }
 
     public void Click1()

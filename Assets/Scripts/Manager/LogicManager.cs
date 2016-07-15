@@ -22,7 +22,6 @@ public class LogicManager : MonoBehaviour
     public List<GameObject> unplacedBlocks = new List<GameObject>();
 
     public int rotatingSpeed;
-    public bool rotatingBlock;
 
     public const string BlockPlacedNotification = "LogicManager.BlockPlaced";
     public const string BlockRemovedNotification = "LogicManager.BlockRemoved";
@@ -88,7 +87,6 @@ public class LogicManager : MonoBehaviour
             if (GridScript.Instance.gridGO[(int)tilePos.x, (int)tilePos.y].GetComponent<GridTile>().gType != GridType.Empty)
             {
                 //Debug.Log("Não pode ser colocado " + blockGO + " em " + destiny.x + "," + destiny.y + " pois ja existe um bloco la");
-                blockGO.GetComponent<BlockScript>().bPlaced = false;
                 return false;
             }
         }
@@ -130,23 +128,30 @@ public class LogicManager : MonoBehaviour
             tile.transform.localPosition = tile.relativePos;
 
         int newPos = bs.bPlaced ? unplacedBlocks.Count - 1 : bs.spawnNumber;
-        blockGO.transform.position = SpawnScript.Instance.spawnLocations[newPos].transform.position - Vector3.forward;
+        blockGO.transform.position = SpawnScript.Instance.spawnLocations[newPos].transform.position;
+
+        bs.bPlaced = false;
     }
 
     public void RearrangeBlocks(GameObject blockGO)
     {
         for (int i = 0; i < unplacedBlocks.Count; i++)
         {
-            unplacedBlocks[i].transform.position = SpawnScript.Instance.spawnLocations[i].transform.position;
-            unplacedBlocks[i].GetComponent<BlockScript>().spawnNumber = i;
-            SpawnScript.Instance.spawnLocations[i].GetComponentInChildren<RotationScript>().block = unplacedBlocks[i];
+            if (unplacedBlocks[i] != blockGO)
+            {
+                unplacedBlocks[i].transform.position = SpawnScript.Instance.spawnLocations[i].transform.position;
+                unplacedBlocks[i].GetComponent<BlockScript>().spawnNumber = i;
+                SpawnScript.Instance.spawnLocations[i].GetComponentInChildren<RotationScript>().block = unplacedBlocks[i];
+            }
         }
     }
 
     IEnumerator RotateAnimation(GameObject spawn)
     {
-        rotatingBlock = true;
         GameObject block = spawn.GetComponent<RotationScript>().block;
+        foreach (BlockTile tile in block.GetComponent<BlockScript>().tileList)
+            tile.GetComponent<BoxCollider2D>().enabled = false;
+
         Transform spawnLoc = SpawnScript.Instance.spawnLocations[spawn.GetComponent<RotationScript>().spawnNumber].transform;
         for (float i = 0; i < 90 / rotatingSpeed; i++)
         {
@@ -156,7 +161,11 @@ public class LogicManager : MonoBehaviour
         block.transform.position = spawnLoc.position - Vector3.forward;
         block.transform.rotation = Quaternion.Euler(Vector3.zero);
         block.GetComponent<BlockScript>().RotateBlock();
-        rotatingBlock = false;
+
+        foreach (BlockTile tile in block.GetComponent<BlockScript>().tileList)
+            tile.GetComponent<BoxCollider2D>().enabled = true;
+
+        RearrangeBlocks(null);
     }
 
     void LevelCompleted()

@@ -24,6 +24,25 @@ public class BlockScript : MonoBehaviour
     public int solutionIndex;
     public bool bTip;
 
+    #region Notifications
+    void OnEnable()
+    {
+        this.AddObserver(Pause, UIManager.PauseNotification);
+    }
+
+    void OnDisable()
+    {
+        this.RemoveObserver(Pause, UIManager.PauseNotification);
+    }
+
+    void Pause(object sender, object info)
+    {
+        bool paused = GameManager.Instance.gamePaused;
+        foreach (BlockTile tile in tileList)
+            tile.GetComponent<BoxCollider2D>().enabled = !paused;
+    }
+    #endregion
+
     void Awake()
     {
         bNumber = GameManager.Instance.activeBlocks.Count;

@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class SpawnScript : MonoBehaviour {
-
+public class SpawnScript : MonoBehaviour
+{
     #region Singleton Pattern
     private static SpawnScript instance = null;
 
@@ -13,92 +13,75 @@ public class SpawnScript : MonoBehaviour {
     #endregion
 
     public int gridSize;
-    public int blockSize = 3;
-
-    int spawnColumns;
-    float spawnSpacingX;
-    float spawnSpacingY;
-    Vector3 spawnPos;
-
+    public float blockScale;
+    public int spawnColumns = 3;
     public List<GameObject> spawnLocations;
-    public float blockScale = 0.6f;
     
+    float spawnSize;
+    Vector2 spacing;
+    Vector3 baseSpawn;
 
-    void Awake ()
+    void Awake()
     {
         instance = this;
-
         gridSize = GameManager.Instance.gridSize;
-        FixCamera();
-        
-        int numberOfSpawns = 15;
 
-        for (int n = 0; n < numberOfSpawns; n++)
+        Camera cam = GameObject.FindObjectOfType<Camera>();
+        cam.transform.position = new Vector3(0.5f * (gridSize - 1), (gridSize - 0.5f), -10);
+        cam.orthographicSize = gridSize;
+
+        //Generate Spawns
+        for (int n = 0; n < 15; n++)
         {
             GameObject spawn = Instantiate(Resources.Load("Prefabs/SpawnHolder"), Vector3.zero, Quaternion.identity) as GameObject;
             spawn.transform.SetParent(GameObject.Find("Spawn Locations").transform);
             spawn.name = "Spawn " + n;
-            spawn.tag = "Spawn";
-            Vector3 pos = new Vector3(-spawnSpacingX * (n % spawnColumns), ((n / spawnColumns) * spawnSpacingY), 0);
-            spawn.transform.position = pos + spawnPos;
 
             Transform background = spawn.transform.Find("Spawn Background");
-            background.localScale = Vector3.one * blockScale * blockSize;
+            background.localScale = Vector3.one * blockScale * 3;
             background.localPosition = Vector3.one * blockScale;
 
             Transform rotButton = spawn.transform.Find("Rotation Button");
             rotButton.localScale = Vector3.one * blockScale * 0.8f;
-            rotButton.localPosition = new Vector3(2.5f * blockScale, -rotButton.localScale.x / 2, -2);
+            rotButton.localPosition = new Vector3(2.5f * blockScale, -rotButton.localScale.x / 2, -1.5f);
             rotButton.GetComponent<RotationScript>().spawnNumber = n;
 
             spawnLocations.Add(spawn);
-        }       
-	}
-
-    void FixCamera()
-    {
-        Camera cam = GameObject.FindObjectOfType<Camera>();
-
-        switch (gridSize)
-        {
-            case 4:
-                cam.transform.position = new Vector3(1.5f, 3.5f, -10);
-                cam.orthographicSize = 5f;
-
-                spawnColumns = 3;
-                spawnSpacingX = 1.75f;
-                spawnSpacingY = 1.75f;
-                spawnPos = new Vector3(2.75f, 4f);
-                blockScale = 0.5f;
-                break;
-            case 5:
-                cam.transform.position = new Vector3(2f, 5f, -10);
-                cam.orthographicSize = 6.5f;
-
-                spawnColumns = 3;
-                spawnSpacingX = 2f;
-                spawnSpacingY = 2f;
-                spawnPos = new Vector3(3.5f, 5f);
-                blockScale = 0.55f;
-                break;
-            case 6:
-                cam.transform.position = new Vector3(2.5f, 5f, -10);
-                cam.orthographicSize = 6.5f;
-
-                spawnColumns = 4;
-                spawnSpacingX = 1.75f;
-                spawnSpacingY = 1.75f;
-                spawnPos = new Vector3(4.6f, 6f);
-                blockScale = 0.5f;
-                break;
         }
     }
 
-    public void DeleteSpawns()
+    public void FixSpawnsPosition()
     {
-        for (int n = GameManager.Instance.activeBlocks.Count; n < spawnLocations.Count; n++)
+        blockScale = gridSize / (4 * spawnColumns - 1f);
+        spawnSize = 3 * blockScale;
+        spacing = Vector2.one * 0.8f * blockScale;
+        baseSpawn = new Vector3((spawnColumns - 1) * (spawnSize + spacing.x) + 0.5f * blockScale - 0.5f, GridScript.Instance.gridGO[0,gridSize - 1].transform.position.y + 1, 0);
+
+        for (int n = 0; n < GameManager.Instance.activeBlocks.Count; n++)
+        {
+            Vector3 pos = new Vector3(-(n % spawnColumns) * (spacing.x + spawnSize), ((n / spawnColumns) * (spacing.y + spawnSize)), 0);
+            spawnLocations[n].transform.position = pos + baseSpawn;
+
+            Transform background = spawnLocations[n].transform.Find("Spawn Background");
+            background.localScale = Vector3.one * blockScale * 3;
+            background.localPosition = Vector3.one * blockScale;
+
+            Transform rotButton = spawnLocations[n].transform.Find("Rotation Button");
+            rotButton.localScale = Vector3.one * blockScale * 0.8f;
+            rotButton.localPosition = new Vector3(2.5f * blockScale, -rotButton.localScale.x / 2, -1.5f);
+        }
+
+        LogicManager.Instance.RearrangeBlocks(null);
+        foreach (GameObject block in GameManager.Instance.activeBlocks)
+            block.transform.localScale = Vector3.one * blockScale;
+    }
+
+    public void DeleteExtraSpawns()
+    {
+        for (int n = spawnLocations.Count - 1; n >= GameManager.Instance.activeBlocks.Count; n--)
         {
             Destroy(spawnLocations[n]);
+            spawnLocations.RemoveAt(n);
         }
     }
 }

@@ -5,18 +5,9 @@ using System;
 
 public class LevelSelectorScript : MonoBehaviour
 {
-
     public int gridSize;
     public int levelToLoad;
 
-    void Awake()
-    {
-        SaveLoad.LoadProgress();
-        if (SaveLoad.mapsCompleted[gridSize, levelToLoad] == true)
-        {
-            GetComponentInChildren<Text>().text += "*";
-        }
-    }
 
     public void Click()
     {

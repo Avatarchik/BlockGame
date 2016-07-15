@@ -43,6 +43,9 @@ public class GameManager : MonoBehaviour
             LogicManager.Instance.totalTiles = gridSize * gridSize - GridScript.Instance.filledListPos.Count;
             LogicManager.Instance.unplacedBlocks = activeBlocks;
             GameObject.Find("Tiles Text").GetComponent<Text>().text = LogicManager.Instance.tilesLeft + "/" + LogicManager.Instance.totalTiles;
+
+            SpawnScript.Instance.DeleteExtraSpawns();
+            SpawnScript.Instance.FixSpawnsPosition();
         }
     }
 
@@ -72,8 +75,6 @@ public class GameManager : MonoBehaviour
             for (int r = 0; r < Random.Range(0, 4); r++)
                 blockGO.GetComponent<BlockScript>().RotateBlock();
         }
-
-        SpawnScript.Instance.DeleteSpawns();
         Debug.LogWarning("Map Loaded!");
     }
 

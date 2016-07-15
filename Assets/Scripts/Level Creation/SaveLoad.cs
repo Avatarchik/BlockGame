@@ -109,10 +109,10 @@ public static class SaveLoad
     #region Player Progression
     public static void SaveProgress()
     {
-        string mapsCompletedPath = Path.Combine(Application.streamingAssetsPath, "mapsCompleted.gd");
+        //C:/Users/lucap/AppData/LocalLow/DefaultCompany/TesteBloco
+        string mapsCompletedPath = Application.persistentDataPath + "/mapsCompleted.gd";
 
-        //Open file
-        if (File.Exists(mapsCompletedPath))                         
+        if (File.Exists(mapsCompletedPath))
         {
             BinaryFormatter bf = new BinaryFormatter();
             FileStream file = File.Open(mapsCompletedPath, FileMode.Open);
@@ -120,7 +120,7 @@ public static class SaveLoad
             file.Close();
         }
         else
-            mapsCompleted = new bool[10, 100];
+            LoadProgress();
   
         int gridSize = GameManager.Instance.gridSize;
         int level = GameManager.Instance.level;
@@ -135,28 +135,8 @@ public static class SaveLoad
 
     public static void LoadProgress()
     {
-        string mapsCompletedPath = "";
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            // Android
-            string oriPath = System.IO.Path.Combine(Application.streamingAssetsPath, "mapsCompleted.gd");
-
-            // Android only use WWW to read file
-            WWW reader = new WWW(oriPath);
-            while (!reader.isDone) { }
-
-            string realPath = Application.persistentDataPath + "/mapsCompleted.gd";
-            System.IO.File.WriteAllBytes(realPath, reader.bytes);
-
-            mapsCompletedPath = realPath;
-        }
-        else
-        {
-            // iOS
-            mapsCompletedPath = System.IO.Path.Combine(Application.streamingAssetsPath, "mapsCompleted.gd");
-        }
-
-
+        string mapsCompletedPath = Application.persistentDataPath + "/mapsCompleted.gd";
+        
         if (File.Exists(mapsCompletedPath))
         {
             BinaryFormatter bf = new BinaryFormatter();
@@ -173,6 +153,19 @@ public static class SaveLoad
             file2.Close();
             Debug.LogWarning("Save criado!");
         }    
+    }
+
+    public static void ResetProgress()
+    {
+        string mapsCompletedPath = Application.persistentDataPath + "/mapsCompleted.gd";
+        File.Delete(mapsCompletedPath);
+
+        mapsCompleted = new bool[10, 100];
+        BinaryFormatter bf2 = new BinaryFormatter();
+        FileStream file2 = File.Create(mapsCompletedPath);
+        bf2.Serialize(file2, mapsCompleted);
+        file2.Close();
+        Debug.LogWarning("Save Resetado");
     }
     #endregion
 }

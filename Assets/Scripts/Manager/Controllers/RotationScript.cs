@@ -16,7 +16,7 @@ public class RotationScript : MonoBehaviour
 
     void OnMouseDown()
     {
-        if (block && !LogicManager.Instance.rotatingBlock && !block.GetComponent<BlockScript>().bPlaced)
+        if (block)
             this.PostNotification(RotateBlock, gameObject.GetComponentInParent<Transform>().gameObject);
     }
 }

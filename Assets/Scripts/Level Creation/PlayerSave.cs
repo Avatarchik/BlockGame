@@ -4,6 +4,6 @@ using System.Collections.Generic;
 
 public static class PlayerSave
 {
-    public static int currentGridSize = 5;
-    public static int currentLevel = 0;
+    public static int currentGridSize = 6;
+    public static int currentLevel = 3;
 }

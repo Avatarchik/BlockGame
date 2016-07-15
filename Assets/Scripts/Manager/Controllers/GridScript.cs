@@ -41,8 +41,6 @@ public class GridScript : MonoBehaviour {
                 gridGO[x, y].GetComponent<GridTile>().gridPos = new Vector2(x, y);
             }
         }
-
-        FillGrid();
     }
 
     public void FillGrid()
