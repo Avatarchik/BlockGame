@@ -21,7 +21,8 @@ public class LogicManager : MonoBehaviour
 
     public List<GameObject> unplacedBlocks = new List<GameObject>();
 
-    public int rotatingSpeed;
+    public int rotatingSpeed = 8;
+    public int moveSpeed = 8;
 
     public const string BlockPlacedNotification = "LogicManager.BlockPlaced";
     public const string BlockRemovedNotification = "LogicManager.BlockRemoved";
@@ -139,7 +140,8 @@ public class LogicManager : MonoBehaviour
         {
             if (unplacedBlocks[i] != blockGO)
             {
-                unplacedBlocks[i].transform.position = SpawnScript.Instance.spawnLocations[i].transform.position;
+                StartCoroutine(MoveAnimation(unplacedBlocks[i], unplacedBlocks[i].transform.position, SpawnScript.Instance.spawnLocations[i].transform.position, moveSpeed));
+                //unplacedBlocks[i].transform.position = SpawnScript.Instance.spawnLocations[i].transform.position;
                 unplacedBlocks[i].GetComponent<BlockScript>().spawnNumber = i;
                 SpawnScript.Instance.spawnLocations[i].GetComponentInChildren<RotationScript>().block = unplacedBlocks[i];
             }
@@ -166,6 +168,18 @@ public class LogicManager : MonoBehaviour
             tile.GetComponent<BoxCollider2D>().enabled = true;
 
         RearrangeBlocks(null);
+    }
+
+    IEnumerator MoveAnimation(GameObject block, Vector3 startPos, Vector3 endPos, int speed)
+    {
+        float i = 0f;
+        float rate = 1f * speed;
+        while (i < 1.0)
+        {
+            i += Time.deltaTime * rate;
+            block.transform.position = Vector3.Lerp(startPos, endPos, i);
+            yield return null;
+        }
     }
 
     void LevelCompleted()

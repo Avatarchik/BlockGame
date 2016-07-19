@@ -14,7 +14,6 @@ public class GridScript : MonoBehaviour {
 
     public GameObject[,] gridGO;
 
-    public Color filledColor;
     public Color[] blocksColor = new Color[10];
     public List<Vector2> filledListPos = new List<Vector2>();
 
@@ -29,7 +28,7 @@ public class GridScript : MonoBehaviour {
     void CreateGrid()
     {
         gridSize = GameManager.Instance.gridSize;
-        gridGO = new GameObject[gridSize + 2, gridSize + 2];
+        gridGO = new GameObject[gridSize, gridSize];
 
         for (int x = 0; x < gridSize; x++)
         {
@@ -49,7 +48,7 @@ public class GridScript : MonoBehaviour {
         {
             int x = (int)filledPos.x;
             int y = (int)filledPos.y;
-            gridGO[x, y].GetComponent<SpriteRenderer>().color = filledColor;
+            gridGO[x, y].GetComponent<SpriteRenderer>().color = Color.clear;
             gridGO[x, y].GetComponent<GridTile>().gType = GridType.Filled;
         }      
     }

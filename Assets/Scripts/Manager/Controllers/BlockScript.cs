@@ -4,10 +4,6 @@ using System.Collections.Generic;
 
 public class BlockScript : MonoBehaviour
 {
-    //[SerializeField]
-    //int[] bLocations;
-    //public int[,] bMatrix;
-
     public List<BlockTile> tileList = new List<BlockTile>();
     public int bNumber;
     public int spawnNumber;
@@ -127,65 +123,4 @@ public class BlockScript : MonoBehaviour
         foreach (Transform child in transform) children.Add(child.gameObject);
         children.ForEach(child => Destroy(child));
     }
-
-    //void CreateBlock()
-    //{
-    //    for (int i = 0; i < 3; i++)
-    //        for (int j = 0; j < 3; j++)
-    //            bMatrix[i, j] = -1;
-
-    //    foreach (int loc in bLocations)
-    //    {
-    //        switch (loc)
-    //        {
-    //            case 1: bMatrix[0, 0] = bNumber; break;
-    //            case 2: bMatrix[1, 0] = bNumber; break;
-    //            case 3: bMatrix[2, 0] = bNumber; break;
-    //            case 4: bMatrix[0, 1] = bNumber; break;
-    //            case 5: bMatrix[1, 1] = bNumber; break;
-    //            case 6: bMatrix[2, 1] = bNumber; break;
-    //            case 7: bMatrix[0, 2] = bNumber; break;
-    //            case 8: bMatrix[1, 2] = bNumber; break;
-    //            case 9: bMatrix[2, 2] = bNumber; break;
-    //            default:
-    //                Debug.Log("Número inválido para criação de bloco" + loc);
-    //                break;
-    //        }
-    //    }
-    //}
-
-    //void GetBlockIDs()
-    //{
-    //    for (int r = 0; r < 4; r++)
-    //    {
-    //        int bitPos = 0;
-    //        int bID = 0;
-    //        for (int y = 0; y < 3; y++)
-    //        {
-    //            for (int x = 3 - 1; x >= 0; x--)
-    //            {
-    //                if (bMatrix[x, y] == bNumber)
-    //                {
-    //                    bID += (int)Mathf.Pow(2, bitPos);
-    //                    rotPos[r] = new Vector2(x, y);
-    //                }
-    //                bitPos++;
-    //            }
-    //        }
-    //        rotID[r] = System.Convert.ToString(bID, 2);
-    //        char[] removeChars = { '0' };
-    //        rotID[r] = rotID[r].TrimEnd(removeChars);
-
-    //        //Rotate block matrix
-    //        int[,] rotatedMatrix = new int[3, 3];
-    //        int[,] originalMatrix = bMatrix;
-
-    //        for (int x = 0; x < 3; x++)
-    //            for (int y = 0; y < 3; y++)
-    //                rotatedMatrix[x, y] = originalMatrix[3 - y - 1, x];
-
-    //        bMatrix = rotatedMatrix;
-    //        rotIndex = (rotIndex % 4);
-    //    }
-    //}
 }

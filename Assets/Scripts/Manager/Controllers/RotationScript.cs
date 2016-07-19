@@ -10,13 +10,13 @@ public class RotationScript : MonoBehaviour
 
     void Start()
     {
-        if (!GameObject.FindObjectOfType<LevelGeneratorScript>())
+        if (StateMachine.state == GameState.InGame || StateMachine.state == GameState.LevelGenerator)
             block = LogicManager.Instance.unplacedBlocks[spawnNumber];
     }
 
     void OnMouseDown()
     {
-        if (block)
+        if (block && !block.GetComponent<BlockScript>().bPlaced)
             this.PostNotification(RotateBlock, gameObject.GetComponentInParent<Transform>().gameObject);
     }
 }

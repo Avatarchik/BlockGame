@@ -18,6 +18,11 @@ public class LevelGeneratorScript : MonoBehaviour
 
     public const string BlockPlaced = "LogicManager.BlockPlaced";
 
+    void Awake()
+    {
+        StateMachine.state = GameState.LevelGenerator;
+    }
+
     void Start()
     {
         for (int n = 0; n < 100; n++)
@@ -32,6 +37,7 @@ public class LevelGeneratorScript : MonoBehaviour
 
         FillEmptyGrid();
         SpawnScript.Instance.DeleteExtraSpawns();
+        SpawnScript.Instance.FixSpawnsPosition();
     }
 
     public void Click1()
@@ -66,7 +72,6 @@ public class LevelGeneratorScript : MonoBehaviour
             bs.solutionIndex = bs.rotIndex;
             blockGO.transform.position = SpawnScript.Instance.spawnLocations[bs.bNumber].transform.position - Vector3.forward;
 
-            Debug.Log(blockGO.name + " posicionado em " + bs.solutionPos.x + "," + bs.solutionPos.y);
             string blockID = blockGO.name.Replace("(Clone)", "").Trim();
             sBlockList.Add(new SerializableBlock(blockID, squaresNumber, bs.solutionIndex, (int)bs.solutionPos.x, (int)bs.solutionPos.y));
         }
@@ -133,7 +138,6 @@ public class LevelGeneratorScript : MonoBehaviour
                             bs.solutionIndex = r;
                             block.transform.position = SpawnScript.Instance.spawnLocations[bs.bNumber].transform.position - Vector3.forward;
 
-                            Debug.Log(blockGO.name + " completado em " + (int)gridOffset.x + "," + (int)gridOffset.y);
                             placed = true;
                             
                             sBlockList.Add(new SerializableBlock(block.name, nTiles, bs.solutionIndex, (int)bs.solutionPos.x, (int)bs.solutionPos.y));

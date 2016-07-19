@@ -25,19 +25,19 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         instance = this;
-        if (!GameObject.FindObjectOfType<LevelGeneratorScript>())
+        GetAllBlocks();
+
+        if (StateMachine.state == GameState.InGame)
         {
-            level = PlayerSave.currentLevel;
-            gridSize = PlayerSave.currentGridSize;
+            level = StateMachine.currentLevel;
+            gridSize = StateMachine.currentGridSize;
             Debug.LogWarning("Trying to load map " + gridSize + "x" + level);
         }
     }
 
     void Start()
-    {
-        GetAllBlocks();
-        LogicManager.Instance.tilesLeft = gridSize * gridSize;
-        if (!GameObject.FindObjectOfType<LevelGeneratorScript>())
+    {        
+        if (StateMachine.state == GameState.InGame)
         {
             LoadLevel();
             LogicManager.Instance.totalTiles = gridSize * gridSize - GridScript.Instance.filledListPos.Count;
@@ -54,6 +54,7 @@ public class GameManager : MonoBehaviour
         SaveLoad.LoadMaps();
         Game currentGame = SaveLoad.savedMaps[gridSize][level];
         gridSize = currentGame.gridSize;
+        LogicManager.Instance.tilesLeft = gridSize * gridSize;
 
         //Get filled grid positions
         for (int n = 0; n < currentGame.filledListPosX.Count; n++)
@@ -75,6 +76,8 @@ public class GameManager : MonoBehaviour
             for (int r = 0; r < Random.Range(0, 4); r++)
                 blockGO.GetComponent<BlockScript>().RotateBlock();
         }
+
+        StateMachine.state = GameState.InGame;
         Debug.LogWarning("Map Loaded!");
     }
 

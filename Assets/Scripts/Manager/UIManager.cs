@@ -94,20 +94,22 @@ public class UIManager : MonoBehaviour {
     public void LoadLevelSelector()
     {
         Debug.LogWarning("Going to Level Selector");
+        StateMachine.state = GameState.LevelSelector;
         SceneManager.LoadScene("Level Selector", LoadSceneMode.Single);
     }
 
     public void LoadNextLevel()
     {
-        PlayerSave.currentLevel = GameManager.Instance.level + 1;
+        StateMachine.currentLevel = GameManager.Instance.level + 1;
         SaveLoad.LoadMaps();
         try
         {
-            Game currentGame = SaveLoad.savedMaps[PlayerSave.currentGridSize][PlayerSave.currentLevel];
+            Game currentGame = SaveLoad.savedMaps[StateMachine.currentGridSize][StateMachine.currentLevel];
         }
         catch
         {
-            Debug.LogWarning("Não foi possível carregar o mapa " + PlayerSave.currentGridSize + "x" + PlayerSave.currentLevel);
+            Debug.LogWarning("Não foi possível carregar o mapa " + StateMachine.currentGridSize + "x" + StateMachine.currentLevel);
+            Debug.LogWarning("Total de mapas de tamanho " + StateMachine.currentGridSize + ": " + SaveLoad.savedMaps[StateMachine.currentGridSize].Count);
             return;
         }
         SceneManager.LoadScene("Base Map", LoadSceneMode.Single);

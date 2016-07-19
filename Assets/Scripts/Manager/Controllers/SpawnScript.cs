@@ -71,9 +71,12 @@ public class SpawnScript : MonoBehaviour
             rotButton.localPosition = new Vector3(2.5f * blockScale, -rotButton.localScale.x / 2, -1.5f);
         }
 
-        LogicManager.Instance.RearrangeBlocks(null);
-        foreach (GameObject block in GameManager.Instance.activeBlocks)
-            block.transform.localScale = Vector3.one * blockScale;
+        if (StateMachine.state == GameState.InGame)
+        {
+            LogicManager.Instance.RearrangeBlocks(null);
+            foreach (GameObject block in GameManager.Instance.activeBlocks)
+                block.transform.localScale = Vector3.one * blockScale;
+        }   
     }
 
     public void DeleteExtraSpawns()

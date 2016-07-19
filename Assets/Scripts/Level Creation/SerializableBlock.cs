@@ -11,12 +11,12 @@ public class SerializableBlock {
     public int solvedPosX;
     public int solvedPosY;
 
-    public SerializableBlock(string _name, int _tiles, int _index,int _posX, int _posY)
+    public SerializableBlock(string _name, int _tiles, int _solvedIndex,int _solvedPosX, int _solvedPosY)
     {
         blockName = _name;
         tilesNumber = _tiles;
-        solvedIndex = _index;
-        solvedPosX = _posX;
-        solvedPosY = _posY;
+        solvedIndex = _solvedIndex;
+        solvedPosX = _solvedPosX;
+        solvedPosY = _solvedPosY;
     }
 }
