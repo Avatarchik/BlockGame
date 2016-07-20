@@ -24,9 +24,9 @@ public class SpawnScript : MonoBehaviour
     void Awake()
     {
         instance = this;
-        gridSize = GameManager.Instance.gridSize;
+        gridSize = StateMachine.currentGridSize;
 
-        Camera cam = GameObject.FindObjectOfType<Camera>();
+        Camera cam = FindObjectOfType<Camera>();
         cam.transform.position = new Vector3(0.5f * (gridSize - 1), (gridSize - 0.5f), -10);
         cam.orthographicSize = gridSize;
 
@@ -71,12 +71,18 @@ public class SpawnScript : MonoBehaviour
             rotButton.localPosition = new Vector3(2.5f * blockScale, -rotButton.localScale.x / 2, -1.5f);
         }
 
+        foreach (GameObject block in LogicManager.Instance.unplacedBlocks)
+            block.transform.localScale = Vector3.one * blockScale;
+
         if (StateMachine.state == GameState.InGame)
         {
-            LogicManager.Instance.RearrangeBlocks(null);
-            foreach (GameObject block in GameManager.Instance.activeBlocks)
-                block.transform.localScale = Vector3.one * blockScale;
-        }   
+            for (int i = 0; i < LogicManager.Instance.unplacedBlocks.Count; i++)
+            {
+                LogicManager.Instance.unplacedBlocks[i].transform.position =  spawnLocations[i].transform.position;
+                LogicManager.Instance.unplacedBlocks[i].GetComponent<BlockScript>().spawnNumber = i;
+                spawnLocations[i].GetComponentInChildren<RotationScript>().block = LogicManager.Instance.unplacedBlocks[i];
+            }
+        }
     }
 
     public void DeleteExtraSpawns()

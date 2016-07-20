@@ -17,7 +17,6 @@ public class BlockTile : Tile
             bTile.GetComponent<SpriteRenderer>().sortingOrder = 2;
 
         RemoveBlockGrid(parentBlock.gameObject);
-        LogicManager.Instance.RearrangeBlocks(parentBlock.gameObject);
 
         if (parentBlock.bPlaced)
             this.PostNotification(LogicManager.BlockRemovedNotification, parentBlock.gameObject);

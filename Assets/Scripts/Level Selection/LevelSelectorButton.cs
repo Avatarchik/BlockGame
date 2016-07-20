@@ -22,7 +22,7 @@ public class LevelSelectorButton : MonoBehaviour
         }        
         else
         {
-            gameObject.SetActive(false);
+            gameObject.GetComponent<Button>().interactable = false;
         }      
     }
 

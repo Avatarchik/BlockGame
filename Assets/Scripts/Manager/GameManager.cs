@@ -27,16 +27,27 @@ public class GameManager : MonoBehaviour
         instance = this;
         GetAllBlocks();
 
+        if (FindObjectOfType<LevelCreator>())
+            StateMachine.state = GameState.LevelCreator;
+        else
+        {
+            if (FindObjectOfType<LevelGeneratorScript>())
+                StateMachine.state = GameState.LevelGenerator;
+            else
+                StateMachine.state = GameState.InGame;
+        }
+        Debug.Log("STATE: " + StateMachine.state.ToString());
+
+        gridSize = StateMachine.currentGridSize;
         if (StateMachine.state == GameState.InGame)
         {
             level = StateMachine.currentLevel;
-            gridSize = StateMachine.currentGridSize;
             Debug.LogWarning("Trying to load map " + gridSize + "x" + level);
         }
     }
 
     void Start()
-    {        
+    {
         if (StateMachine.state == GameState.InGame)
         {
             LoadLevel();

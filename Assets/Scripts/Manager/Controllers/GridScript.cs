@@ -27,7 +27,7 @@ public class GridScript : MonoBehaviour {
 
     void CreateGrid()
     {
-        gridSize = GameManager.Instance.gridSize;
+        gridSize = StateMachine.currentGridSize;
         gridGO = new GameObject[gridSize, gridSize];
 
         for (int x = 0; x < gridSize; x++)
@@ -38,6 +38,8 @@ public class GridScript : MonoBehaviour {
                 gridGO[x, y].transform.parent = GameObject.Find("Grid").transform;
                 gridGO[x, y].name = ("grid pos " + x + "," + y);
                 gridGO[x, y].GetComponent<GridTile>().gridPos = new Vector2(x, y);
+                if (StateMachine.state == GameState.LevelCreator)
+                    gridGO[x, y].GetComponent<BoxCollider2D>().enabled = true;
             }
         }
     }

@@ -51,7 +51,7 @@ public class LogicManager : MonoBehaviour
         GameObject.Find("Tiles Text").GetComponent<Text>().text = tilesLeft + "/" + totalTiles;
         Debug.Log(block.name + " was placed on " + block.GetComponent<BlockScript>().bPos);
 
-        if (tilesLeft == 0)
+        if (tilesLeft == 0 && StateMachine.state == GameState.InGame)
             LevelCompleted();
     }
 
@@ -68,7 +68,7 @@ public class LogicManager : MonoBehaviour
     {
         GameObject spawn = info as GameObject;
         spawn.GetComponentInChildren<RotationScript>().rotating = true;
-        StartCoroutine("RotateAnimation", spawn);        
+        StartCoroutine("RotateAnimation", spawn);
         Debug.Log(spawn.GetComponent<RotationScript>().block.name + " was rotated");
     }
     #endregion
@@ -80,7 +80,7 @@ public class LogicManager : MonoBehaviour
         {
             //Bloco esta dentro do grid?
             Vector2 tilePos = destiny - (bs.rotPos[bs.rotIndex] - bTile.relativePos);
-            if (tilePos.x < 0 || tilePos.x >= GameManager.Instance.gridSize || tilePos.y < 0 || tilePos.y >= GameManager.Instance.gridSize)
+            if (tilePos.x < 0 || tilePos.x >= StateMachine.currentGridSize || tilePos.y < 0 || tilePos.y >= StateMachine.currentGridSize)
             {
                 //Debug.Log(blockGO + " fora do grid!");
                 return false;
@@ -117,7 +117,7 @@ public class LogicManager : MonoBehaviour
         bs.bPos = destiny;
 
         this.PostNotification(BlockPlacedNotification, blockGO);
-        RearrangeBlocks(blockGO);
+        RearrangeBlocks();
         SpawnScript.Instance.spawnLocations[unplacedBlocks.Count].GetComponentInChildren<RotationScript>().block = null;
     }
 
@@ -136,17 +136,13 @@ public class LogicManager : MonoBehaviour
         bs.bPlaced = false;
     }
 
-    public void RearrangeBlocks(GameObject blockGO)
+    public void RearrangeBlocks()
     {
         for (int i = 0; i < unplacedBlocks.Count; i++)
         {
-            if (unplacedBlocks[i] != blockGO)
-            {
-                StartCoroutine(MoveAnimation(unplacedBlocks[i], unplacedBlocks[i].transform.position, SpawnScript.Instance.spawnLocations[i].transform.position, moveSpeed));
-                //unplacedBlocks[i].transform.position = SpawnScript.Instance.spawnLocations[i].transform.position;
-                unplacedBlocks[i].GetComponent<BlockScript>().spawnNumber = i;
-                SpawnScript.Instance.spawnLocations[i].GetComponentInChildren<RotationScript>().block = unplacedBlocks[i];
-            }
+            StartCoroutine(MoveAnimation(unplacedBlocks[i], unplacedBlocks[i].transform.position, SpawnScript.Instance.spawnLocations[i].transform.position, moveSpeed));
+            unplacedBlocks[i].GetComponent<BlockScript>().spawnNumber = i;
+            SpawnScript.Instance.spawnLocations[i].GetComponentInChildren<RotationScript>().block = unplacedBlocks[i];
         }
     }
 
@@ -169,20 +165,21 @@ public class LogicManager : MonoBehaviour
         foreach (BlockTile tile in block.GetComponent<BlockScript>().tileList)
             tile.GetComponent<BoxCollider2D>().enabled = true;
 
-        RearrangeBlocks(null);
+        RearrangeBlocks();
         spawn.GetComponent<RotationScript>().rotating = false;
     }
 
     IEnumerator MoveAnimation(GameObject block, Vector3 startPos, Vector3 endPos, int speed)
     {
-        float i = 0f;
-        float rate = 1f * speed;
-        while (i < 1.0)
+        float step = (speed / (startPos - endPos).magnitude) * Time.fixedDeltaTime;
+        float t = 0;
+        while (t <= 1.0f)
         {
-            i += Time.deltaTime * rate;
-            block.transform.position = Vector3.Lerp(startPos, endPos, i);
-            yield return null;
+            t += step; // Goes from 0 to 1, incrementing by step each time
+            block.transform.position = Vector3.Lerp(startPos, endPos, t); // Move objectToMove closer to b
+            yield return null;         // Leave the routine and return here in the next frame
         }
+        block.transform.position = endPos;
     }
 
     void LevelCompleted()

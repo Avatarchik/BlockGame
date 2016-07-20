@@ -26,6 +26,10 @@ public class Game {
             filledListPosY.Add((int)pos.y);
         }
 
-        sBlockList = GameObject.FindObjectOfType<LevelGeneratorScript>().sBlockList;
+        switch (StateMachine.state)
+        {
+            case GameState.LevelGenerator: sBlockList = GameObject.FindObjectOfType<LevelGeneratorScript>().sBlockList; break;
+            case GameState.LevelCreator: sBlockList = GameObject.FindObjectOfType<LevelCreator>().sBlockList; break;
+        }        
     }
 }

@@ -4,7 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
-public class UIManager : MonoBehaviour {
+public class UIManager : MonoBehaviour
+{
 
     #region Singleton Pattern
     private static UIManager instance = null;
@@ -19,8 +20,19 @@ public class UIManager : MonoBehaviour {
 
     public GameObject pauseMenuCanvas;
     public GameObject levelCompletedCanvas;
+    public Button nextLevelButton;
 
     public static string PauseNotification = "UIManager.Pause";
+
+    void Start()
+    {
+        SaveLoad.LoadMaps();
+
+        if (StateMachine.currentLevel + 1 >= SaveLoad.savedMaps[StateMachine.currentGridSize].Count)
+            nextLevelButton.interactable = false;
+
+        LogicManager.Instance.RearrangeBlocks();
+    }
 
     public void GiveTip()
     {
@@ -46,7 +58,7 @@ public class UIManager : MonoBehaviour {
         foreach (BlockTile bTile in bs.tileList)
         {
             Vector2 tilePos = bs.solutionPos - (bs.rotPos[bs.rotIndex] - bTile.relativePos);
-            
+
             GameObject tipBlock = Instantiate(Resources.Load("Prefabs/Base Block Square"), new Vector3(tilePos.x, tilePos.y, -1f), Quaternion.identity) as GameObject;
             Destroy(tipBlock.GetComponent<BlockTile>());
             tipBlock.GetComponent<SpriteRenderer>().color = bs.bColor;
@@ -95,13 +107,12 @@ public class UIManager : MonoBehaviour {
     {
         Debug.LogWarning("Going to Level Selector");
         StateMachine.state = GameState.LevelSelector;
-        SceneManager.LoadScene("Level Selector", LoadSceneMode.Single);
+        SceneManager.LoadScene("Level Selector");
     }
 
     public void LoadNextLevel()
     {
-        StateMachine.currentLevel = GameManager.Instance.level + 1;
-        SaveLoad.LoadMaps();
+        StateMachine.currentLevel++;
         try
         {
             Game currentGame = SaveLoad.savedMaps[StateMachine.currentGridSize][StateMachine.currentLevel];
@@ -109,7 +120,6 @@ public class UIManager : MonoBehaviour {
         catch
         {
             Debug.LogWarning("Não foi possível carregar o mapa " + StateMachine.currentGridSize + "x" + StateMachine.currentLevel);
-            Debug.LogWarning("Total de mapas de tamanho " + StateMachine.currentGridSize + ": " + SaveLoad.savedMaps[StateMachine.currentGridSize].Count);
             return;
         }
         SceneManager.LoadScene("Base Map", LoadSceneMode.Single);
