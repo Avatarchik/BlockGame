@@ -48,7 +48,13 @@ public class LevelGeneratorScript : MonoBehaviour
     public void Click2()
     {
         SaveLoad.SaveMap();
-    }      
+    }
+
+    public void RestartLevel()
+    {
+        Scene scene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(scene.name);
+    }
 
     #region Private
     //Tenta colocar blocos de 4 ou 5 squares em uma posição aleatoria no grid

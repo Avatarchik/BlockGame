@@ -26,7 +26,7 @@ public class GridSelectionButton : MonoBehaviour {
             }
         }
         float percentage = (completedLevels * 100f) / totalLevels;
-        percentageText.text = percentage.ToString("#") + "%";
+        percentageText.text = Mathf.FloorToInt(percentage) + "%";
     }
 
     public void ButtonClick()

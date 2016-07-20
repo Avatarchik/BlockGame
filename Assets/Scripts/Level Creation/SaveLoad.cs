@@ -9,6 +9,8 @@ public static class SaveLoad
     public static List<Game>[] savedMaps;
     public static bool[,] mapsCompleted;
 
+    static int maxLevelsNumber = 100;
+
     #region Maps
     public static void SaveMap()
     {
@@ -146,7 +148,7 @@ public static class SaveLoad
         }
         else
         {
-            mapsCompleted = new bool[10, 100];
+            mapsCompleted = new bool[10, maxLevelsNumber];
             BinaryFormatter bf2 = new BinaryFormatter();
             FileStream file2 = File.Create(mapsCompletedPath);
             bf2.Serialize(file2, mapsCompleted);
@@ -160,7 +162,7 @@ public static class SaveLoad
         string mapsCompletedPath = Application.persistentDataPath + "/mapsCompleted.gd";
         File.Delete(mapsCompletedPath);
 
-        mapsCompleted = new bool[10, 100];
+        mapsCompleted = new bool[10, maxLevelsNumber];
         BinaryFormatter bf2 = new BinaryFormatter();
         FileStream file2 = File.Create(mapsCompletedPath);
         bf2.Serialize(file2, mapsCompleted);

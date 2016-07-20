@@ -24,11 +24,13 @@ public class BlockScript : MonoBehaviour
     void OnEnable()
     {
         this.AddObserver(Pause, UIManager.PauseNotification);
+        this.AddObserver(LevelCompleted, LogicManager.LevelCompletedNotification);
     }
 
     void OnDisable()
     {
         this.RemoveObserver(Pause, UIManager.PauseNotification);
+        this.RemoveObserver(LevelCompleted, LogicManager.LevelCompletedNotification);
     }
 
     void Pause(object sender, object info)
@@ -36,6 +38,12 @@ public class BlockScript : MonoBehaviour
         bool paused = GameManager.Instance.gamePaused;
         foreach (BlockTile tile in tileList)
             tile.GetComponent<BoxCollider2D>().enabled = !paused;
+    }
+
+    void LevelCompleted(object sender, object info)
+    {
+        foreach (BlockTile tile in tileList)
+            tile.GetComponent<BoxCollider2D>().enabled = false;
     }
     #endregion
 

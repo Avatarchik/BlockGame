@@ -26,6 +26,7 @@ public class LogicManager : MonoBehaviour
 
     public const string BlockPlacedNotification = "LogicManager.BlockPlaced";
     public const string BlockRemovedNotification = "LogicManager.BlockRemoved";
+    public const string LevelCompletedNotification = "LogicManager.LevelCompleted";
 
     #region Notifications
     public void OnEnable()
@@ -66,7 +67,8 @@ public class LogicManager : MonoBehaviour
     void RotateBlock(object sender, object info)
     {
         GameObject spawn = info as GameObject;
-        StartCoroutine("RotateAnimation", spawn);
+        spawn.GetComponentInChildren<RotationScript>().rotating = true;
+        StartCoroutine("RotateAnimation", spawn);        
         Debug.Log(spawn.GetComponent<RotationScript>().block.name + " was rotated");
     }
     #endregion
@@ -168,6 +170,7 @@ public class LogicManager : MonoBehaviour
             tile.GetComponent<BoxCollider2D>().enabled = true;
 
         RearrangeBlocks(null);
+        spawn.GetComponent<RotationScript>().rotating = false;
     }
 
     IEnumerator MoveAnimation(GameObject block, Vector3 startPos, Vector3 endPos, int speed)
@@ -186,6 +189,7 @@ public class LogicManager : MonoBehaviour
     {
         GameObject.Find("Tiles Text").GetComponent<Text>().text = "DONE!";
         SaveLoad.SaveProgress();
+        this.PostNotification(LevelCompletedNotification);
         UIManager.Instance.levelCompletedCanvas.SetActive(true);
     }
 }
