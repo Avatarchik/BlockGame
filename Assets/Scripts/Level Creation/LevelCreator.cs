@@ -42,8 +42,7 @@ public class LevelCreator : MonoBehaviour
     {
         LogicManager.Instance.unplacedBlocks = GameManager.Instance.activeBlocks;
         LogicManager.Instance.totalTiles = StateMachine.currentGridSize * StateMachine.currentGridSize;
-        LogicManager.Instance.tilesLeft = LogicManager.Instance.totalTiles;
-        GameObject.Find("Tiles Text").GetComponent<Text>().text = LogicManager.Instance.tilesLeft + "/" + LogicManager.Instance.totalTiles;
+        GameObject.Find("Tiles Text").GetComponent<Text>().text = LogicManager.Instance.tilesUsed + "/" + LogicManager.Instance.totalTiles;
 
         SpawnScript.Instance.DeleteExtraSpawns();
         SpawnScript.Instance.FixSpawnsPosition();    
@@ -52,7 +51,7 @@ public class LevelCreator : MonoBehaviour
 
     public void SaveMap()
     {
-        if (LogicManager.Instance.unplacedBlocks.Count != 0 || LogicManager.Instance.tilesLeft != 0)
+        if (LogicManager.Instance.unplacedBlocks.Count != 0 || LogicManager.Instance.tilesUsed != LogicManager.Instance.totalTiles)
         {
             Debug.Log("Existem blocos não posicionados!");
             return;
@@ -71,8 +70,16 @@ public class LevelCreator : MonoBehaviour
 
     public void LoadGridSelection()
     {
-        Debug.LogWarning("Going to Level Creator");
-        StateMachine.state = GameState.LevelCreator;
-        SceneManager.LoadScene("Level Creator");
+        Debug.LogWarning("Going to Grid Selector");
+        StateMachine.state = GameState.GridSelector;
+        SceneManager.LoadScene("Grid Selector");
+    }
+
+    public void InsertBlock()
+    {
+        GameManager.Instance.gamePaused = true;
+        this.PostNotification(UIManager.PauseNotification);
+
+        GameObject.Find("BlockSize Panel").SetActive(true);
     }
 }

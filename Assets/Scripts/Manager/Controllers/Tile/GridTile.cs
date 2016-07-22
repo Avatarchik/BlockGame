@@ -18,17 +18,15 @@ public class GridTile : Tile
                 GridScript.Instance.filledListPos.Add(gridPos);
                 GetComponent<SpriteRenderer>().color = Color.clear;
                 LogicManager.Instance.totalTiles--;
-                LogicManager.Instance.tilesLeft--;
                 break;
             case GridType.Filled:
                 gType = GridType.Empty;
                 GridScript.Instance.filledListPos.Remove(gridPos);
                 GetComponent<SpriteRenderer>().color = Color.grey;
                 LogicManager.Instance.totalTiles++;
-                LogicManager.Instance.tilesLeft++;
                 break;
         }
 
-        GameObject.Find("Tiles Text").GetComponent<Text>().text = LogicManager.Instance.tilesLeft + "/" + LogicManager.Instance.totalTiles;
+        GameObject.Find("Tiles Text").GetComponent<Text>().text = LogicManager.Instance.tilesUsed + "/" + LogicManager.Instance.totalTiles;
     }
 }

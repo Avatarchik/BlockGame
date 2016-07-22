@@ -10,20 +10,26 @@ public class LevelSelectorButton : MonoBehaviour
 
     void Start()
     {
-        gridSize = StateMachine.currentGridSize;
+        CheckMapExists();
+    }
 
+    public void CheckMapExists()
+    {
+        gridSize = StateMachine.currentGridSize;
         if (levelToLoad < SaveLoad.savedMaps[gridSize].Count)
         {
+            gameObject.GetComponent<Button>().interactable = true;
+
             if (SaveLoad.savedMaps[gridSize][levelToLoad] != null)
             {
                 if (SaveLoad.mapsCompleted[gridSize, levelToLoad] == true)
                     GetComponentInChildren<Text>().text += "*";
             }
-        }        
+        }
         else
         {
             gameObject.GetComponent<Button>().interactable = false;
-        }      
+        }
     }
 
     public void Click()

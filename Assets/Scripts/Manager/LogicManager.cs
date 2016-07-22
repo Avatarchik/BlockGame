@@ -16,13 +16,13 @@ public class LogicManager : MonoBehaviour
     void Awake() { instance = this; }
     #endregion
 
-    public int tilesLeft;
+    public int tilesUsed;
     public int totalTiles;
 
     public List<GameObject> unplacedBlocks = new List<GameObject>();
 
-    public int rotatingSpeed = 8;
-    public int moveSpeed = 8;
+    int rotatingSpeed = 8;
+    int moveSpeed = 25;
 
     public const string BlockPlacedNotification = "LogicManager.BlockPlaced";
     public const string BlockRemovedNotification = "LogicManager.BlockRemoved";
@@ -46,21 +46,21 @@ public class LogicManager : MonoBehaviour
     void BlockPlaced(object sender, object info)
     {
         GameObject block = info as GameObject;
-        tilesLeft -= block.GetComponent<BlockScript>().tileList.Count;
+        tilesUsed += block.GetComponent<BlockScript>().tileList.Count;
         unplacedBlocks.Remove(block);
-        GameObject.Find("Tiles Text").GetComponent<Text>().text = tilesLeft + "/" + totalTiles;
+        GameObject.Find("Tiles Text").GetComponent<Text>().text = tilesUsed + "/" + totalTiles;
         Debug.Log(block.name + " was placed on " + block.GetComponent<BlockScript>().bPos);
 
-        if (tilesLeft == 0 && StateMachine.state == GameState.InGame)
+        if (tilesUsed == totalTiles && StateMachine.state == GameState.InGame)
             LevelCompleted();
     }
 
     void BlockRemoved(object sender, object info)
     {
         GameObject block = info as GameObject;
-        tilesLeft += block.GetComponent<BlockScript>().tileList.Count;
+        tilesUsed -= block.GetComponent<BlockScript>().tileList.Count;
         unplacedBlocks.Add(block);
-        GameObject.Find("Tiles Text").GetComponent<Text>().text = tilesLeft + "/" + totalTiles;
+        GameObject.Find("Tiles Text").GetComponent<Text>().text = tilesUsed + "/" + totalTiles;
         Debug.Log(block.name + " was removed");
     }
 

@@ -53,7 +53,7 @@ public class GameManager : MonoBehaviour
             LoadLevel();
             LogicManager.Instance.totalTiles = gridSize * gridSize - GridScript.Instance.filledListPos.Count;
             LogicManager.Instance.unplacedBlocks = activeBlocks;
-            GameObject.Find("Tiles Text").GetComponent<Text>().text = LogicManager.Instance.tilesLeft + "/" + LogicManager.Instance.totalTiles;
+            GameObject.Find("Tiles Text").GetComponent<Text>().text = LogicManager.Instance.tilesUsed + "/" + LogicManager.Instance.totalTiles;
 
             SpawnScript.Instance.DeleteExtraSpawns();
             SpawnScript.Instance.FixSpawnsPosition();
@@ -65,13 +65,13 @@ public class GameManager : MonoBehaviour
         SaveLoad.LoadMaps();
         Game currentGame = SaveLoad.savedMaps[gridSize][level];
         gridSize = currentGame.gridSize;
-        LogicManager.Instance.tilesLeft = gridSize * gridSize;
+        LogicManager.Instance.totalTiles = gridSize * gridSize;
 
         //Get filled grid positions
         for (int n = 0; n < currentGame.filledListPosX.Count; n++)
         {
             GridScript.Instance.filledListPos.Add(new Vector2(currentGame.filledListPosX[n], currentGame.filledListPosY[n]));
-            LogicManager.Instance.tilesLeft--;
+            LogicManager.Instance.totalTiles--;
         }
         GridScript.Instance.FillGrid();
 
