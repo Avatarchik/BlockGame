@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
-
     #region Singleton Pattern
     private static UIManager instance = null;
 
@@ -37,8 +36,8 @@ public class UIManager : MonoBehaviour
     public void GiveTip()
     {
         List<GameObject> notPlacedBlocks = new List<GameObject>();
-        foreach (GameObject block in GameManager.Instance.activeBlocks)
-            if (!block.GetComponent<BlockScript>().bPlaced && !block.GetComponent<BlockScript>().bTip)
+        foreach (GameObject block in LogicManager.Instance.unplacedBlocks)
+            if (!block.GetComponent<BlockScript>().bTip)
                 notPlacedBlocks.Add(block);
 
         if (notPlacedBlocks.Count == 0)
